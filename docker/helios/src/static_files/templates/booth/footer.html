@@ -1,0 +1,12 @@
+
+<span class="float-right">
+	{{!--
+	<a class="btn btn-sm btn-primary" target="_new" href="mailto:{{:election_metadata.help_email}}?subject=ajuda%20com%20eleição%20{{:election.name}}&body=Preciso%20de%20ajuda%20com%20a%20eleição%20%20{{:election.uuid}}"><span class="fas fa-fw fa-question"></span> Ajuda</a>
+	--}}
+	<a class="btn btn-sm btn-primary" target="_new" href="/static/ajuda/eleitor/index.html"><span class="fas fa-fw fa-question"></span> Ajuda</a>
+</span>
+{{if election.BOGUS_P}}
+	<small class="text-center d-block">A chave pública desta eleição ainda não está pronta. Esta eleição está no modo pré-visualização.</small>
+{{else}}
+	<small class="text-center d-block">Código de Identificação da Eleição:<br/><span class="text-monospace font-weight-bold text-nowrap">{{:election.hash}}</span></small>
+{{/if}}

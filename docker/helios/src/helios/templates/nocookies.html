@@ -1,0 +1,14 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Cookies são necessários para o uso do Sistema de Eleições{% endblock %}
+
+{% block content %}
+	<h2 class="title">Helios requer o uso de Cookies</h2>
+
+	<p>
+		Parece que o seu navegador não aceita cookies ou está configurado para bloqueá-los nesse site. O Helios precisa configurar um cookie de sessão para poder salvar o seu voto, deixar você conectar-se, etc. Habilite o uso de cookies e então <a href="{{retest_url}}">prossiga para preparar sua cédula</a>
+	</p>
+	<p>
+		Se você continua sendo enviado para esta página, é provavel que você não habilitou os cookies com sucesso.
+	</p>
+{% endblock %}

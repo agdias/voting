@@ -1,0 +1,16 @@
+{{for answers}}
+	<div class="form-row answer">
+		<div class="col-md-1"><label class="col-form-label">Opção #{{:#index + 1 + ~first_answer}}</label></div>
+		<div class="col-md-5">
+			<input class="form-control answer_text" name="answer_{{:#index + 1 + ~first_answer}}" placeholder="Nome da Opção" value="{{:}}">
+		</div>
+		<div class="form-group col-md-5">
+			<div class="input-group mb-2">
+				<div class="input-group-prepend">
+					<div class="input-group-text"><span class="fa fa-fw fa-globe"></span></div>
+				</div>
+				<input type="url" class="form-control answer_url" name="answer_url_{{:#index + 1 + ~first_answer}}" placeholder="Página web que contém mais detalhes" value="{{:#parent.parent.data.answer_urls[#index]}}">
+			</div>
+		</div>
+	</div>
+{{/for}}

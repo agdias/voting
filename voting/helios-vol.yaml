@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: helios-vol
+spec:
+  accessModes: ["ReadWriteOnce"]
+  nfs:
+    server: 172.17.1.136
+    path: /share/nfs/okd/helios/dados/
+  capacity:
+    storage: 5Gi

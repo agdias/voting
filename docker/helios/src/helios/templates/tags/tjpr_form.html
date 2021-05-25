@@ -1,0 +1,53 @@
+{% load widget_tweaks %}
+{% load define_action %}
+
+{% for field in form %}
+	{% if field.is_hidden %}
+		{{ field }}
+	{% else %}
+		{% if tipo == 'default' %}
+			<div class="form-group">
+				{% define "form-control" as classes %}
+				{% if field|widget_type == 'select' %}
+					{% define classes|add:" custom-select" as classes %}
+				{% endif %}
+				<label for="{{ field.auto_id }}">{{ field.label }}</label>
+				{{ field|add_class:classes }}
+
+				{% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+			</div>
+		{% endif %}
+
+		{% if tipo == 'horizontal' %}
+			<div class="form-group row {% if field.errors %}has-error{% endif %}">
+				<label for="{{ field.auto_id }}" class="col-sm-2 control-label">{{ field.label }}</label>
+				<div class="col-sm-10">
+					<div>
+						{% if field|field_type == 'datetimefield' %}
+							<div class="input-group col-md-3 p-0">
+								<div class="input-group-prepend">
+									<div class="input-group-text"><span class="fa fa-fw fa-calendar-alt"></span></div>
+								</div>
+								{{ field|add_class:'form-control' }}
+							</div>
+						{% else %}
+							{{ field }}
+						{% endif %}
+						{% if field.errors %}
+							<span class="text-danger">
+							{% for error in field.errors %}
+								{{ error }}
+							{% endfor %}
+							</span>
+						{% endif %}
+					</div>
+					<small class="form-text text-muted">{{ field.help_text }}</small>
+				</div>
+			</div>
+		{% endif %}
+
+	{% endif %}
+{% endfor %}
+{% for hidden in single_form.hidden_fields %}
+	{{ hidden }}
+{% endfor %}

@@ -1,0 +1,78 @@
+<div class="d-flex justify-content-between">
+	<h3>Revise sua Cédula</h3>
+
+	{{if election_metadata.use_advanced_audit_features}}
+		<span>
+			<button class="btn btn-sm btn-warning" type="button" data-toggle="modal" data-target="#confirmarAuditoria"><span class="fas fa-fw fa-chart-bar"></span> Auditar</button>
+		</span>
+		<div class="modal fade" id="confirmarAuditoria" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Auditar Cédula</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body text-justify">
+						<p>Se você quiser, você pode auditar sua cédula e revelar como suas escolhas foram criptografadas.</p>
+						<p>Você será guiado para criptografar novamente suas escolhas para o depósito final da cédula.</p>
+						<p class="small text-muted">Este procedimento é opcional.</p>
+					</div>
+					<div class="modal-footer">
+						<input type="button" value="Checar Criptografia" class="btn btn-primary" data-dismiss="modal" onclick="BOOTH.audit_ballot();"/>
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{{/if}}
+</div>
+
+<div class="card">
+	<ul class="list-group list-group-flush">
+		{{for questions}}
+			<li class="list-group-item">
+				<a class="btn btn-sm btn-warning float-right" onclick="BOOTH.show_question({{:#index}}); return false;" href="#"><span class="fas fa-fw fa-pencil-alt"></span> Editar</a>
+				<b>Questão {{:#index + 1}}: {{:short_name}}</b>
+				<div class="ml-3">
+					{{if ~root.choices[#getIndex()].length == 0}}
+						<div class="text-muted">&#x2610; <i>Nenhuma opção selecionada</i></div>
+					{{/if}}
+
+					{{for ~root.choices[#getIndex()]}}
+						<div>&#x2713; {{:}}</div>
+					{{/for}}
+
+					{{if ~root.choices[#getIndex()].length < max}}
+						<span class="text-muted small">Você votou parcialmente: é possível selecionar até {{if max == 1}} uma opção {{else}} {{:max}} opções {{/if}}</span>
+					{{/if}}
+				</div>
+			</li>
+		{{/for}}
+	</ul>
+</div>
+
+<div class="small">
+	Seu rastreador de cédula é <span class="text-monospace font-weight-bold text-nowrap overflow-auto">{{:encrypted_vote_hash}}</span>, e você pode <a onclick="BOOTH.show_receipt(); return false;" href="#">imprimi-lo</a><br /><br />
+</div>
+
+<div class="m-2 text-justify">
+	Assim que V. Exa. clicar em "Enviar este Voto!", a versão descriptografada de sua cédula será destruída e, somente a versão criptografada permanecerá. A versão criptografada será enviada ao servidor do sistema de Eleições.
+</div>
+
+<div class="text-center">
+	<button class="btn btn-lg btn-success" id="proceed_button" onclick="BOOTH.cast_ballot();">
+		<span class="spinner-border spinner-border-sm" role="status" id="vote-spinner" style="display: none;"></span>
+		<span class="fas fa-fw fa-check" id="vote-check"></span>
+		Enviar este Voto!
+	</button>
+</div>
+
+<form method="POST" action="{{:cast_url}}" id="send_ballot_form" class="prettyform">
+	<input type="hidden" name="election_uuid" value="{{:election_uuid}}" />
+	<input type="hidden" name="election_hash" value="{{:election_hash}}" />
+	<textarea name="encrypted_vote" style="display: none;">
+		{{:encrypted_vote_json}}
+	</textarea>
+</form>

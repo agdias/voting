@@ -1,0 +1,33 @@
+{% extends TEMPLATE_BASE %}
+{% load tjpr_form %}
+
+{% block title %}Nova Eleição{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item active">Nova Eleição</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">Criar uma Nova Eleição</h2>
+
+	<div class="card">
+		<div class="card-body">
+			{% if error %}
+				<p style="color: red;">{{error}}</p>
+			{% endif %}
+
+			<form action="" class="form-horizontal" method="POST" id="create_election_form">
+				<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+				{% tjpr_form election_form 'horizontal' %}
+				<div class="text-right">
+					<input type="submit" class="btn btn-primary" value="Próximo &gt;&gt;" id="next_button" />
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

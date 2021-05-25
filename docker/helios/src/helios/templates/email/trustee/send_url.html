@@ -1,0 +1,9 @@
+{% extends 'email/email-base.html' %}
+
+{% block content %}
+    <p>Você foi designado como integrante da Comissão Eleitoral para a eleição <strong>{{ trustee.election.name }}</strong>.</p>
+    <p>Você deve, obrigatoriamente, entrar no endereço abaixo para que possa carregar suas informações de integrante. Se não fizer isto, não será possível dar continuidade à eleição.</p>
+    <p>A sua página de integrante da Comissão Eleitoral pode ser acessada no endereço: <a href="{{ url }}">{{ url }}</a></p>
+    <br/>
+    <p>Caso necessite de auxílio para o procedimento de geração de chaves, o passo a passo é detalhado nesta seção da ajuda: <a href="{{ host }}/static/ajuda/gestor/apurador-gerar.html">{{ host }}/static/ajuda/gestor/apurador-gerar.html</a></p>
+{% endblock %}

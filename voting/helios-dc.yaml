@@ -1,0 +1,170 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: helios-voting
+  namespace: helio
+spec:
+  replicas: 1
+  selector:
+    deployment-config.name: helios-voting
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment-config.name: helios-voting
+    spec:
+      volumes:
+      -  name: helios-dados
+         persistentVolumeClaim:
+          claimName: helios-dados-claim
+      containers:
+      - image: angelodias/helios:latest
+        name: helios
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - name: helios-dados
+          mountPath: /dados
+        env:
+        - name: URL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: URL_HOST
+
+        - name: CELERY_BROKER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: CELERY_BROKER_URL
+
+        - name: TZ
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: TZ
+
+        - name: PYTHONPATH
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: PYTHONPATH
+
+        - name: STATIC_ROOT
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: STATIC_ROOT
+
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: DATABASE_URL
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: DATABASE_URL
+
+        - name: DATABASE_SSLMODE
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: DATABASE_SSLMODE
+
+        - name: AUTH_ENABLED_AUTH_SYSTEMS
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: AUTH_ENABLED_AUTH_SYSTEMS
+
+        - name: AUTH_DEFAULT_AUTH_SYSTEM
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: AUTH_DEFAULT_AUTH_SYSTEM
+
+        - name: KEYCLOAK_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: KEYCLOAK_SERVER_URL
+
+        - name: KEYCLOAK_REALM
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: KEYCLOAK_REALM
+
+        - name: KEYCLOAK_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: KEYCLOAK_CLIENT_ID
+
+        - name: KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: KEYCLOAK_CLIENT_SECRET
+
+        - name: EMAIL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: EMAIL_HOST
+
+        - name: EMAIL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: EMAIL_PORT
+
+        - name: DEFAULT_FROM_EMAIL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: DEFAULT_FROM_EMAIL
+
+        - name: DEFAULT_FROM_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: DEFAULT_FROM_NAME
+
+        - name: HELP_EMAIL_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: HELP_EMAIL_ADDRESS
+
+        - name: SITE_TITLE
+          valueFrom:
+            configMapKeyRef:
+             name: helios-cm
+             key: SITE_TITLE
+
+        - name: WELCOME_MESSAGE
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: WELCOME_MESSAGE
+
+        - name: SECRET_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: SECRET_KEY
+        - name: MAIN_LOGO_URL
+          valueFrom:
+            configMapKeyRef:
+              name: helios-cm
+              key: MAIN_LOGO_URL
+
+
+
+

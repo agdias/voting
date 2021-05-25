@@ -1,0 +1,27 @@
+{% extends 'email/email-base.html' %}
+
+{% block content %}
+	<p>Caro (a) {{voter.name}},</p>
+
+	<p>{{custom_message|safe|linebreaksbr}}</p>
+	<br>
+	<p>
+		A apuração da eleição <strong>{{election.name}}</strong> foi realizada e liberada:
+		<br>
+		<a href="{{election_url}}">{{election_url}}</a>
+	</p>
+
+	{% if voter.vote_hash %}
+		<br>
+		<p>
+			O código de rastreamento de sua cédula nesta eleição foi:
+			<em>{{voter.vote_hash}}</em>
+			<br>
+			<br>
+			Se você acha que esse rastreador está errado, por favor, entre em contato.
+			<br>
+		</p>
+	{% else %}
+		<p>Parece que você não votou nessa eleição. Se você acha que votou, por favor, entre em contato.</p>
+	{% endif %}
+{% endblock %}

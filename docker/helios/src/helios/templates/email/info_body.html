@@ -1,0 +1,9 @@
+{% extends 'email/email-base.html' %}
+
+{% block content %}
+	<p>Caro (a) {{voter.name}},</p>
+
+	<p>{{custom_message|safe|linebreaksbr}}</p>
+	<br>
+	<p>Você pode acessar a eleição através do link <a href="{{election_vote_url}}">{{election_vote_url}}</a></p>
+{% endblock %}

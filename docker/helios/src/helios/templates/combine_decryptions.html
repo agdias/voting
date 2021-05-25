@@ -1,0 +1,25 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Computar Apuração &mdash; {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Computar Apuração</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+<h2 class="title">{{election.name}} &mdash; Computar Apuração</h2>
+
+<p>Você está prestes a computar a apuração desta eleição. Somente depois disso é que você verá o resultado.</p>
+
+<form method="POST" action="">
+	<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+	<button class="btn btn-primary" type="submit"><span class="fa fa-fw fa-check"></span> Computar a apuração!</button>
+</form>
+
+{% endblock %}

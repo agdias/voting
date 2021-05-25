@@ -1,0 +1,11 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+	<h2 class="title">A eleição {{election.name}} ainda não está aberta para votação</h2>
+
+	<p>Esta eleição ainda não está aberta. Você provavelmente chegou até aqui vindo da Pré-visualização da Cédula.</p>
+
+	<p>
+		<a href="{% url 'one-election-view' election.uuid %}"><span class="fa fa-fw fa-arrow-left"></span>Voltar para a eleição</a>
+	</p>
+{% endblock %}

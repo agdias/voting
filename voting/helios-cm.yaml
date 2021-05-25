@@ -1,0 +1,36 @@
+apiVersion: v1
+data:
+  AUTH_DEFAULT_AUTH_SYSTEM: keycloak
+  AUTH_ENABLED_AUTH_SYSTEMS: keycloak
+  CELERY_BROKER_URL: amqp://admin:admin@broker:5672//
+  DATABASE_SSLMODE: disable
+  DATABASE_URL: postgres://postgres:postgres@database:5432/helios
+  DEFAULT_FROM_EMAIL: helios@tjpr.jus.br
+  DEFAULT_FROM_NAME: "Helios Voting"
+  EMAIL_HOST: xxxxxxxxxxx.local
+  EMAIL_PORT: "25"
+  HELP_EMAIL_ADDRESS: "atendimento@tjmg.jus.br"
+  KEYCLOAK_CLIENT_ID: xxxxxxxxx
+  KEYCLOAK_CLIENT_SECRET: XXXXXXXXXXXXXXXXx
+  KEYCLOAK_REALM: xxxxxxxxxxxxxxx
+  KEYCLOAK_SERVER_URL: https://keycloak.xxxx.jus.br/
+  LDAP_URL: ldap://ldap.local
+  LDAP_BIND_DN: xxxxxxxxxxx
+  LDAP_BIND_PASSWORD: xxxxxxxxx
+  LDAP_SEARCH_BASE_DN: OU=TJPR, DC=tjpr, DC=net
+  LDAP_SEARCH_FILTER: "(sAMAccountName=%(user)s)"
+  PGID: "1000"
+  PUID: "1000"
+  PYTHONPATH: /app
+  STATIC_ROOT: /dados/static
+  TZ: America/Sao_Paulo
+  URL_HOST: http://localhost:8080
+  SITE_TITLE: "Sistema de Votação - TJMG"
+  WELCOME_MESSAGE: "Bem-vindo ao Sistema de Votação do TJMG"
+  SECRET_KEY: "xxx"
+  MAIN_LOGO_URL: "/static/tjpr.png"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: helios-cm
+  namespace: helio

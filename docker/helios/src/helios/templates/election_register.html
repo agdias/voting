@@ -1,0 +1,18 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+	<h2 class="title">{{ election.name }} – Registrar</h2>
+
+	{% if user %}
+		<p>Você está conectado atualmente como {{user.user_id}} [{{user.user_type}}]</p>
+		{% if voter %}
+			<p>Atualmente você está registrado para essa eleição.</p>
+		{% else %}
+			<p>Você <em>não está</em> registrado para essa eleição.</p>
+
+			<form method="post" action="{% url "one-election-register" election.uuid %}">
+				<input type="submit" value="registrar!" />
+			</form>
+		{% endif %}
+	{% endif %}
+{% endblock %}

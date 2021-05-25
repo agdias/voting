@@ -1,0 +1,33 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}{{cast_vote.vote_tinyhash}} &mdash; {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-list-pretty' election.uuid %}">Eleitores e Cédulas</a></li>
+			<li class="breadcrumb-item active">Voto: <span class="text-monospace">{{cast_vote.vote_tinyhash}}</span></li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">Voto depositado <span class="text-monospace">{{cast_vote.vote_tinyhash}}</span></h2>
+	<div class="mb-3">
+		Depositado em <a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a><br />
+		Código de Identificação: <div class="text-monospace font-weight-bold text-nowrap overflow-auto d-md-inline">{{cast_vote.vote_hash}}</div><br />
+		por <b>
+		{% if the_voter.alias %}
+			{{the_voter.alias}}
+		{% else %}
+			{{the_voter.name}}
+		{% endif %}
+		</b>
+	</div>
+	<a class="btn btn-primary" href="#" onclick="$('#castvote_content').toggle(); return false;"><span class="fa fa-fw fa-search-plus"></span> Detalhes</a>
+	<div style="display:none;" class="mt-3" id="castvote_content">
+		<textarea cols="100" rows="10" class="form-control text-monospace">{{vote_content}}</textarea>
+	</div>
+{% endblock %}

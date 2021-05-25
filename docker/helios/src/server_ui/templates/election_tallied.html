@@ -1,0 +1,9 @@
+{% extends 'server_ui/templates/base.html' %}
+
+{% block content %}
+	<h2 class="title">A Eleição {{election.name}} já foi apurada</h2>
+
+	<p>Esta eleição já foi apurada (ou está em andamento), então você não pode mais depositar um voto.</p>
+
+	<p><a href="{% url "helios.views.one_election_view" election.uuid %}">visualizar a eleição</a></p>
+{% endblock %}

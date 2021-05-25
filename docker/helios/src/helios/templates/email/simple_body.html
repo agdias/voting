@@ -1,0 +1,17 @@
+{% extends 'email/email-base.html' %}
+
+{% block content %}
+	<p><strong> Caro(a) {{voter.name}},</strong></p>
+
+	<p>{{custom_message|safe|linebreaksbr}}
+
+	<p>Para votar nessa eleição, clique no link: <a href="{{election_vote_url}}">{{election_vote_url}}</a></p>
+	<br>
+	{% ifequal voter.voter_type "password" %}
+		<p><strong>Seu ID de eleitor:</strong> {{voter.voter_login_id}}
+		<br><strong>Sua senha para votar nessa eleição:</strong> {{voter.voter_password}}</p>
+	{% else %}
+		{# <p>Autentique-se com sua conta de usuário {{voter.voter_type}}.</p> #}
+		<p>Autentique-se com sua credencial.</p>
+	{% endifequal %}
+{% endblock %}

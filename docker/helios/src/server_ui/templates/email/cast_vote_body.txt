@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html lang="pt-br">
+<title>{{default_from_name|safe}}</title>
+<head>
+<meta charset="utf-8">
+</head>
+<body>
+	<p><strong>{{voter.name}}</strong>,</p>
+	<p>Seu voto foi depositado com sucesso para {{election.name}}</p>
+	<p>
+		O seu voto foi registrado com o seguinte código de confirmação:
+		<br>
+		<strong>{{cast_vote.vote_hash}}</strong>
+	</p>
+	<br>
+	<p>O seu voto está guardado em: {{cast_vote_url}}</p>
+
+	{% if election.use_voter_aliases %}
+		<br>
+		<p> O seu pseudônimo de eleitor é: <strong>{{voter.alias}}</strong></p>
+	{% endif %}
+
+	<br>
+
+	<p>O resultado da eleição será divulgado em horário e local conforme Edital.</p>
+	--
+	<br>
+	<font size="1" face="verdana, sans-serif">
+		<b>Tribunal de Justiça do Estado do Paraná</b>
+	</font>
+	<br>
+	<font size="1" face="verdana, sans-serif">
+		Pç. Nossa Senhora de Salette - Centro Cívico / Curitiba - PR / CEP: 80530-912
+	</font>
+	<br>
+	<u><a href="https://www.tjpr.jus.br" target="_blank" style=""><font style="" face="verdana, sans-serif">www.tjpr.jus.br</font></a></u>
+</body>
+</html>

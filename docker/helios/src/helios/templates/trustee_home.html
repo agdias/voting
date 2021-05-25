@@ -1,0 +1,45 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Página do Integrante da Comissão Eleitoral{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item active">Página do Integrante da Comissão Eleitoral</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Integrante da Comissão Eleitoral {{trustee.name}} &mdash; Administração</span></h2>
+
+	<p>
+		{% if trustee.public_key_hash %}
+		<div class="mt-5">
+			Você enviou com sucesso sua chave pública.<br />
+			O código de identificação de sua chave pública é: <div class="text-monospace font-weight-bold text-nowrap overflow-auto d-md-inline">{{trustee.public_key_hash}}</div>.
+			<div class="mt-3">
+				Utilize o link a seguir para <a href="{% url 'trustee-check-sk' election.uuid trustee.uuid %}">verificar que você tem a chave privada correta</a>.
+			</div>
+		</div>
+		{% else %}
+			<a class="btn btn-primary" href="{% url 'trustee-keygenerator' election.uuid trustee.uuid %}"><span class="fa fa-fw fa-key"></span> Configurar sua chave</a>
+		{% endif %}
+	</p>
+
+	<div>
+	{% if election.encrypted_tally %}
+		{% if trustee.decryption_factors %}
+			Você enviou com sucesso sua descriptografia.
+		{% else %}
+			A apuração criptografada desta eleição está pronta.<br />
+			<a class="btn btn-primary" href="{% url 'trustee-decrypt-and-prove' election.uuid trustee.uuid %}"><span class="fa fa-fw fa-key"></span> Descriptografar com sua chave</a>
+		{% endif %}
+	{% else %}
+		<div class="text-justify">
+			<p class="font-weight-bold">ATENÇÃO: Quando a apuração for computada, você vai ser solicitado a retornar para essa página e informar sua chave secreta para poder descriptografar a apuração.</p>
+			<p>Você deve manter o e-mail que recebeu com o link para a sua página de integrante da Comissão Eleitoral, o qual contém as credenciais necessárias para retornar a esta página.</p>
+		</div>
+	{% endif %}
+	</div>
+{% endblock %}

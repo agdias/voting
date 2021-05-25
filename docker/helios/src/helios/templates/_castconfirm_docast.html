@@ -1,0 +1,61 @@
+{% if election.voting_has_started %}
+	{% if not election.voting_has_stopped %}
+
+		<div id="cast_form">
+			<form id="cast_confirm_form" method="post" action="" onsubmit="show_waiting()">
+				<input type="hidden" name="csrf_token" value="{{csrf_token}}"/>
+
+				{% if status_update_label %}
+					<div class="round" style="background: #eee; padding: 10px; border: 1px dashed #888;">
+						<input type="checkbox" name="status_update" value="1" checked/> {{status_update_label}}<br/>
+						<blockquote style="font-size: 1.3em;">
+							"{{status_update_message}}"
+						</blockquote>
+						<input type="hidden" name="status_update_message" value="{{status_update_message}}"/>
+					</div>
+					<br/>
+				{% endif %}
+
+				Conectado como <u>{{voter.display_html_big|safe}}</u><br/><br/>
+
+				<button type="submit" class="btn btn-lg btn-success"><span class="fas fa-fw fa-check"></span> Depositar Cédula</button>
+				
+
+				<div class="small">
+					{% if election.cast_limit == 1 %}
+						O processo de depósito da cédula é final e não poderá ser refeito.
+					{% endif %}
+					{% if election.cast_limit != 1 %}
+						{% if election.cast_limit == 0 %}
+							Você pode depositar quantas cédulas quiser.
+						{% endif %}
+						{% if election.cast_limit > 1 %}
+							O processo de depósito de cédulas poderá ser feito até {{election.cast_limit}} vezes.
+						{% endif %}
+						<br/>Somente a última cédula será considerada.
+					{% endif %}
+				</div>
+			</form>
+
+			<div class="mt-3">
+				<a class="btn btn-danger" href="./view">Cancelar</a>
+				<div class="small">
+					Se V. Exa. cancelar agora, sua cédula <strong>NÃO</strong> será registrada.<br/>
+					É possível reiniciar o processo de votação mais tarde.
+				</div>
+			</div>
+
+			<!-- for now, for CSRF protection, no auto-submit just yet (benadida) -->
+			<!-- <script>$('#cast_confirm_form').submit()</script> -->
+
+		</div>
+	{% else %}
+		<div class="alert alert-warning" role="alert">
+			Desculpe-nos, o período para depósito das cédulas já se encerrou.
+		</div>
+	{% endif %}
+{% else %}
+	<div class="alert alert-warning" role="alert">
+		Desculpe-nos, mas a votação ainda não está aberta para esta eleição.
+	</div>
+{% endif %}

@@ -1,0 +1,55 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Congelar a Eleição: {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Congelar Eleição</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Congelar a Cédula</h2>
+	<p>
+		Assim que a cédula for congelada, nenhuma informação da eleição poderá ser modificada. Isto inclui: suas questões, os integrantes da Comissão Eleitoral, etc.<br />
+		A lista de integrantes da Comissão Eleitoral e suas chaves públicas também serão congeladas.
+	</p>
+
+	<p>
+
+	{% if election.openreg %}
+		O registro para sua eleição está, no momento, <b>aberto</b>, isto significa que qualquer um pode votar, mesmo após o congelamento da cédula.
+	{% else %}
+		O registro para sua eleição está, no momento, <b>fechado</b>, isto significa que apenas eleitores que você indicou conseguirão votar.
+<!--		Como administrador, você ainda poderá modificar a lista de eleitores durante o andamento da eleição.-->
+	{% endif %}
+	</p>
+
+	{% if helios.VOTERS_EMAIL %}
+		<p>Você precisa congelar a cédula antes de poder contactar os eleitores.</p>
+	{% endif %}
+
+	{% if issues_p %}
+		<p>
+			Antes que você consiga congelar a eleição, você precisará:
+			<ul>
+				{% for issue in issues %}
+					<li>{{issue.action}}</li>
+				{% endfor %}
+			</ul>
+			<a href="{% url 'one-election-view' election.uuid %}">voltar para a eleição</a>
+		</p>
+	{% else %}
+		<form method="post" action="">
+			<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+
+			<button class="btn btn-primary" type="submit"><span class="fa fa-fw fa-lock"></span>Congelar a Cédula</button>
+			<a class="btn btn-danger" href="./view"><span class="fa fa-fw fa-times"></span>Deixar para depois</a>
+		</form>
+	{% endif %}
+
+	<br /><br />
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+    <h2 class="title">{{ info_title }}</h2>
+
+    <p>{{ info_content }}</p>
+
+    {% if election %}
+        <p><a href="{% url 'one-election-view' election.uuid %}">voltar para a eleição</a></p>
+    {% endif %}
+{% endblock %}

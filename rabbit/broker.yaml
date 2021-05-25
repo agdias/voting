@@ -1,0 +1,44 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: null
+  name: broker
+  namespace: helios
+  labels:
+    app: broker
+spec:
+  replicas: 1
+  selector:
+    deployment-config.name: broker
+  strategy:
+    resources: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment-config.name: broker
+    spec:
+      containers:
+      - image: rabbitmq:3-management
+        name: default-container
+        env:
+          - name: RABBITMQ_ERLANG_COOKIE
+            valueFrom:
+              configMapKeyRef:
+                name: rabbitmq
+                key: RABBITMQ_ERLANG_COOKIE
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              configMapKeyRef:
+                name: rabbitmq
+                key: RABBITMQ_DEFAULT_USER
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-default-pass
+                key: password
+          - name: RABBITMQ_DEFAULT_VHOST
+            valueFrom:
+              configMapKeyRef:
+                name: rabbitmq
+                key: RABBITMQ_DEFAULT_VHOST

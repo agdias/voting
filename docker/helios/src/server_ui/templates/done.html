@@ -1,0 +1,16 @@
+{% extends 'server_ui/templates/base.html' %}
+{% block title %}Confirm Vote{% endblock %}
+
+{% block content %}
+	<h1>Seu Voto foi Depositado</h1>
+
+	<p>
+		Um voto foi depositado com sucesso para <b>{{voter.voter_id}}</b>, com o código de identificação:
+		<br /><br />
+		<tt style="font-size: 2em;">{{voter.vote_hash}}</tt>
+	</p>
+
+	<p>
+		Visite a <a href="{% url "helios.views.one_election_view" election.uuid %}">página da eleição</a>.
+	</p>
+{% endblock %}

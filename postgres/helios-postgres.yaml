@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: heliosdb
+  name: heliosdb
+  namespace: helio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heliosdb
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: heliosdb
+    spec:
+      volumes:
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: helios-pgclaim
+      containers:
+      - image: angelodias/postgres-generic:202103031034
+        name: postgres-generic
+        env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: helios-postgres-cm
+                key: POSTGRES_USER 
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: helios-postgres-cm
+                key: POSTGRES_PASSWORD
+          - name: ROLE
+            valueFrom:
+              configMapKeyRef:
+                name: helios-postgres-cm
+                key: ROLE
+          - name: PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: helios-postgres-cm
+                key: PASSWORD
+          - name: DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: helios-postgres-cm
+                key: DATABASE
+        volumeMounts:
+          - name: pgdata
+            mountPath: /var/lib/postgresql/data
+
+        

@@ -1,0 +1,14 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Statistics{% endblock %}
+
+{% block content %}
+	<h1>Votos Recentes</h1>
+
+	Últimas 24 horas
+
+	{% for election in elections %}
+		<p>
+			<b><a href="{% url "one-election-view" election.uuid %}">{{election.name}}</a></b> -- {{election.last_cast_vote}} {{election.num_recent_cast_votes}} {{ election.num_recent_cast_votes|pluralize:"voto depositado,votos depositados" }} recentemente
+		</p>
+	{% endfor %}
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Centro de Eleitores e Rastreamento de Cédulas para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Eleitores e Cédulas</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h3 class="title">{{election.name}} &mdash; Centro de Eleitores e Rastreamento de Cédulas</h3>
+
+	<p>
+		<b>Quem pode votar?</b>
+		{% if election.openreg %}
+			{{election.pretty_eligibility|safe}}
+		{% else %}
+			{% if admin_p %}
+				<em>Somente os eleitores listados aqui</em>.
+			{% else %}
+				<em>Somente os eleitores cadastrados pelo administrador</em>.
+			{% endif %}
+		{% endif %}
+	</p>
+
+	{% if admin_p and not election.frozen_at %}
+		{% if election.private_p %}
+			<em>A sua eleição está marcada como privada, o que significa que você não pode abrir registro mais amplo</em>.<br />
+		{% else %}
+		Você pode mudar esta configuração:
+		<form method="post" class="form-horizontal ml-4" action="{% url "voters-eligibility" election.uuid %}">
+			<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="eligibility" value="openreg" id="openreg" {% if election.openreg and not election.eligibility %}CHECKED{% endif %} />
+				<label class="form-check-label" for="openreg">todos podem votar</label>
+			</div>
+			<div class="form-check">
+				<input class="form-check-input" type="radio" name="eligibility" value="closedreg" id="closedreg" {% if not election.openreg %}CHECKED{% endif %} />
+				<label class="form-check-label" for="closedreg">somente os eleitores listados abaixo podem votar</label>
+			</div>
+			{% if categories %}
+				<input type="radio" name="eligibility" value="limitedreg" {% if election.eligibility %}CHECKED{% endif %} /> somente os eleitores que são membros de
+				<select name="category_id">
+					{% for category in categories %}
+						<option value="{{category.id}}" {% if eligibility_category_id == category.id %}SELECTED{% endif %}> {{category.name}}</option>
+					{% endfor %}
+				</select>
+				<br />
+			{% endif %}
+			<input class="btn btn-primary" type="submit" value="Atualizar" />
+		</form>
+		{% endif %}
+	{% endif %}
+
+	{% if email_voters and election.frozen_at and admin_p %}
+		<p><a class="btn btn-primary" href="{% url 'voters-email' election.uuid %}"><span class="fa fa-fw fa-envelope"></span> Enviar e-mail aos eleitores</a></p>
+	{% endif %}
+
+	{% if admin_p %}
+		<!-- Add a Voter: WORK HERE-->
+		{% if upload_p and not election.openreg %}
+			<div class="mt-4 mb-2">
+				<h4>Inclusão de Eleitores</h4>
+				<div class="ml-4">
+					<div>
+						<h5>Por arquivo:</h5>
+						<a class="btn btn-primary ml-4" href="{% url 'voters-upload' election_uuid=election.uuid %}"><span class="fas fa-fw fa-file-csv"></span>Enviar arquivo de eleitores</a>
+					</div>
+					{% if plugins %}
+						<div class="mt-3">
+							<h5>Outras fontes de dado:</h5>
+							<div>
+								{% for plugin in plugins %}
+									<a class="btn btn-primary ml-4" href="{% url 'voters-load' election_uuid=election.uuid system=plugin %}">{{ plugin }}</a>
+								{% endfor %}
+							</div>
+						</div>
+					{% endif %}
+
+					{% if voter_files %}
+						<div class="card mt-4">
+							<div class="card-header" data-toggle="collapse" data-target="#cargas">Cargas Efetuadas <span class="badge badge-pill badge-primary">{{voter_files|length}}</span></div>
+							<ul class="list-group list-group-flush {%if voter_files|length > 3 %}collapse{% endif %}" id="cargas">
+								{% for vf in voter_files %}
+									<li class="list-group-item pl-5">
+										{{vf.voter_file_content|length}} bytes, em {{vf.uploaded_at}} através de <strong>{{ vf.pretty_origin }}</strong>
+										{% if vf.description %}
+											({{ vf.description }})
+										{% endif %}
+										:
+										{% if vf.processing_finished_at %}
+											<em>processado ({{vf.num_voters}} {{vf.num_voters|pluralize:"eleitor cadastrado,eleitores cadastrados"}})</em>
+										{% else %}
+											{% if vf.processing_started_at %}
+												<em>sendo processado</em>
+											{% else %}
+												<em>ainda não processado</em>
+											{% endif %}
+										{% endif %}
+									</li>
+								{% endfor %}
+							</ul>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+
+	{% if voters %}
+		<h4 class="mt-4">Eleitores</h4>
+		<div class="ml-4">
+			{% if admin_p %}
+				{% if election.num_cast_votes %}
+					<p class="font-weight-bold">{{election.num_cast_votes}} {{election.num_cast_votes|pluralize:"voto depositado,votos depositados"}}</p>
+				{% else %}
+					<p class="text-muted font-italic">ainda sem votos</p>
+				{% endif %}
+
+				{% if election.num_voters > 20 %}
+					<div>
+						{% if q %}
+							<p><em>filtrando por <u>{{q}}</u>.</em> <a class="btn btn-sm btn-danger" href="?"><span class="fa fa-fw fa-times"></span>Limpar busca</a></p>
+						{% else %}
+							<form method="get" class="form-horizontal" action="{% url "voters-list-pretty" election.uuid %}">
+								<b>Filtrar pelo nome</b>: <input type="text" placeholder="nome eleitor" name="q" />
+								<button type="submit" class="btn btn-sm btn-primary">
+									<span class="fa fa-fw fa-filter"></span> Filtrar
+								</button>
+							</form>
+						{% endif %}
+					</div>
+				{% endif %}
+
+				{% if voters_page.has_previous %}
+					<a href="./list?page={{voters_page.previous_page_number}}&limit={{limit}}&q={{q|urlencode}}">anterior {{limit}}</a> &nbsp;&nbsp;
+				{% endif %}
+
+				Eleitores {{voters_page.start_index}} - {{voters_page.end_index}} (de {{total_voters}})&nbsp;&nbsp;
+
+				{% if voters_page.has_next %}
+					<a href="./list?page={{voters_page.next_page_number}}&limit={{limit}}&q={{q|urlencode}}">próximo {{limit}}</a> &nbsp;&nbsp;
+				{% endif %}
+
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							{% if admin_p or not election.use_voter_aliases %}
+								{% if admin_p %}
+									<th style="width: 80px;">Ações</th>
+									<th>Login</th>
+									<th>Endereço de e-mail</th>
+								{% endif %}
+								<th>Nome</th>
+							{% endif %}
+
+							{% if election.use_voter_aliases %}
+								<th>Pseudônimo</th>
+							{% endif %}
+							<th>Rastreador da Cédula</th>
+						</tr>
+					</thead>
+					{% for voter in voters %}
+						<tr>
+							{% if admin_p or not election.use_voter_aliases %}
+								{% if admin_p %}
+									<td style="white-space: nowrap;">
+										{% if election.frozen_at %}
+											<a class="badge badge-pill badge-primary" href="{% url 'voters-email' election.uuid %}?voter_id={{voter.voter_login_id}}"><span class="fa fa-envelope"></span></a>
+										{% endif %}
+										<a class="badge badge-pill badge-danger" onclick="return confirm('você tem certeza de que quer remover {{voter.name}} ?');" href="{% url 'voter-delete' election.uuid voter.uuid %}"><span class="fa fa-times"></span></a>
+									</td>
+									<td>{{voter.voter_login_id}}</td>
+									<td>{{voter.voter_email}}</td>
+								{% endif %}
+								<td><img class="small-logo" src="/static/media/login-icons/{{voter.voter_type}}.png" alt="{{voter.voter_type}}" /> {{voter.name}}</td>
+							{% endif %}
+							{% if election.use_voter_aliases %}
+								<td>{{voter.alias}}</td>
+							{% endif %}
+							<td><span class="text-monospace small">{% if voter.vote_hash %}{{voter.vote_hash}}</span><a class="badge badge-pill badge-success ml-3" href="{% url "castvote-shortcut" vote_tinyhash=voter.vote_tinyhash %}"><span class="fa fa-search"></span></a></span>{% else %}&mdash;{% endif %}</td>
+						</tr>
+					{% endfor %}
+				</table>
+			{% else %}
+				Para esta eleição, {{total_voters}} {{total_voters|pluralize:"eleitor está cadastrado e apto,eleitores estão cadastrados e aptos"}} a votar.
+			{% endif %}
+		</div>
+	{% else %}
+		<p class="text-muted font-italic">sem eleitores.</p>
+	{% endif %}
+{% endblock %}

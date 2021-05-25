@@ -1,0 +1,370 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}{{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item active">{{election.name}}</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<div style="float: left; margin-right: 50px;">
+		<h3 class="title">{{ election.name }}</h3>
+		<div class="text-muted mb-4">
+			{{election.description_bleached|safe}}
+		</div>
+
+		<p style="padding-top:0px; margin-top:0px">
+			{{ election.pretty_type }} <em>{% if election.private_p %}privada{%else%}pública{% endif %}</em>{% if settings.SHOW_USER_INFO %} criada por <u><b>{{election.admin.display_html_small|safe}}</b></u>{% endif %}
+			{% if election.is_archived %}
+				<span class="badge badge-pill badge-danger">arquivada</span>
+			{% endif %}
+			{% if admin_p %}
+				{% if not election.frozen_at %}
+					<a class="btn btn-sm btn-warning" href="{% url "one-election-edit" election.uuid %}"><span class="fas fa-fw fa-edit"></span>editar</a>
+				{% endif %}
+				{% if election.is_archived %}
+					<a class="btn btn-sm btn-success" href="{% url "one-election-archive" election_uuid=election.uuid %}?archive_p=0"><span class="fas fa-fw fa-box-open"></span>desarquivar</a>
+				{% else %}
+					<a class="btn btn-sm btn-danger" href="{% url "one-election-archive" election_uuid=election.uuid %}?archive_p=1"><span class="fas fa-fw fa-archive"></span>arquivar</a>
+				{% endif %}
+				<a class="btn btn-sm btn-primary" onclick="return window.confirm('Tem certeza que quer copiar esta eleição?');" href="{% url "one-election-copy" election_uuid=election.uuid %}"><span class="fas fa-fw fa-copy"></span>copiar</a>
+			{% endif %}
+
+			<br />
+			{% if admin_p %}
+				{% if not election.private_p %}
+					{% if election.featured_p %}
+						Esta {{election.pretty_type|lower}} está destacada na página inicial.
+						{% if can_feature_p %}
+							<a class="btn btn-sm btn-danger" href="{% url "one-election-set-featured" election.uuid %}?featured_p=0"><span class="fas fa-fw fa-highlighter"></span>remover destaque</a>
+						{% endif %}
+					{% else %}
+						Esta {{election.pretty_type|lower}} <u>não</u> está destacada na página inicial.
+						{% if can_feature_p %}
+							<a class="btn btn-sm btn-success" href="{% url "one-election-set-featured" election.uuid %}?featured_p=1"><span class="fas fa-fw fa-highlighter"></span>destacar</a>
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		</p>
+	</div>
+
+	<br />
+	<br clear="left" />
+
+	{% if election.election_info_url %}
+		<p style="font-size:1.5em;">[<a target="_blank" href="{{election.election_info_url}}" rel="noopener noreferrer">fazer download das biografias e declarações dos candidatos</a>]</p>
+	{% endif %}
+
+	<p align="center" style="font-size: 1.5em;">
+		<a class="btn btn-primary" href="{% url "one-election-questions" election.uuid %}">
+			Questões
+			<span class="badge badge-pill badge-secondary">{% if election.questions %}{{election.questions|length}}{% else %}0{% endif %}</span>
+		</a>
+		<a class="btn btn-primary" href="{% url 'voters-list-pretty' election.uuid %}">
+			Eleitores e Cédulas
+		</a>
+		<a class="btn btn-primary" href="{% url 'list-trustees-view' election.uuid %}">
+			Comissão Eleitoral
+			<span class="badge badge-pill badge-secondary">{{trustees|length}}</span>
+		</a>
+	</p>
+
+	{% if admin_p %}
+		{% if election.frozen_p %}
+			<div style="background: lightyellow; padding:5px; padding-left: 10px; margin-top: 15px; border: 1px solid #aaa; width: 720px;" class="round">
+				<a href="#" onclick="document.getElementById('badgebody').setAttribute('style', 'display: block;');">Incluir um banner desta eleição</a>
+				<div id="badgebody" style="display:none;">
+					<br />
+					<form action="#">
+						<textarea cols="90" rows="4" wrap="soft">
+							&lt;iframe src="{{election_badge_url}}" frameborder="0" style="border: 1px solid black" height="75" width="200"/&gt;
+						</textarea><br />
+						<p style="font-size:0.8em;">a inclusão deste código HTML em seu site, exibe um fino banner com links diretos para votação.</p>
+					</form>
+				</div>
+			</div>
+		{% endif %}
+
+		<p>
+			{% if election.result_released_at %}
+
+			<!-- election complete, no next step -->
+
+			{% else %}
+				<b>Próximo Passo:</b>
+				<span>
+					{% if not election.frozen_at %}
+						{% if election.issues_before_freeze %}
+							{% for issue in election.issues_before_freeze %}
+								{{issue.action}}{% if forloop.last %}{% else %}, e{% endif %}<br />
+							{% endfor %}
+						{% else %}
+							<a href="{% url 'one-election-freeze' election.uuid %}">congelar cédula e abrir eleição.</a>
+							<br />
+							{% if election.voting_starts_at %}
+								Após fazer isso, a eleição estará pronta para votação e será aberta automaticamente<br />
+								em {{ election.voting_starts_at|date:"d/m/Y H:i" }}, conforme configurado.
+							{% else %}
+								Após fazer isso, a eleição será aberta imediatamente para votação.
+							{% endif %}
+						{% endif %}
+					{% else %}
+						{% if not election.encrypted_tally %}
+							{% if election.tallying_started_at %}
+								A computação da apuração está em andamento.<br />
+								Recarregue esta página em alguns minutos.
+							{% else %}
+								{% if election.voting_deadline and election.voting_deadline >= date_now %}
+									aguardar a finalização da eleição. Confome configuração, a eleição será encerrada, automaticamente, em {{ election.voting_deadline|date:"d/m/Y H:i" }}.
+								{% else %}
+									<a href="{% url 'one-election-compute-tally' election.uuid %}">computar a apuração criptografada</a><br />
+									Os votos criptografados serão combinados em uma apuração criptografada. Uma vez que isto seja feito,
+									os integrantes da Comissão Eleitoral são solicitados a providenciar sua parte da descriptografia.
+								{% endif %}
+							{% endif %}
+						{% else %}
+							{% if election.result %}
+								<a href="{% url 'release-result' election.uuid %}">liberar o resultado</a><br />
+								O resultado mostrado abaixo está visível apenas para você.<br />
+								Após você tornar público o resultado, o mesmo estará disponível para todos.
+							{% else %}
+								{% if election.ready_for_decryption_combination %}
+									<a href="{% url 'combine-decryptions' election.uuid %}">
+									{% if election.num_trustees == 1 %}
+										computar o resultado
+									{% else %}
+										combinar a descriptografia dos integrantes da Comissão Eleitoral e computar o resultado
+									{% endif %}
+									</a><br />
+									{% if election.num_trustees == 1 %}
+										O resultado será computado e exibido apenas para você, o administrador da eleição.
+									{% else %}
+										As partes descriptografadas de cada integrante da Comissão Eleitoral serão combinadas e a apuração será computada<br />
+										Depois de fazer isso, a apuração estará visível apenas para você, o administrador da eleição.
+									{% endif %}
+								{% else %}
+									<a href="{% url 'list-trustees-view' election.uuid %}">integrantes da Comissão Eleitoral (para descriptografia)</a>
+								{% endif %}
+							{% endif %}
+						{% endif %}
+					{% endif %}
+				</span>
+			{% endif %}
+		</p>
+	{% endif %}
+
+	<br />
+
+	{% if show_result %}
+		{% if election.result_released_at %}
+			<span class="highlight-box round">
+				Esta eleição está completa.
+			</span>
+			<br /><br /><br />
+		{% endif %}
+
+		{% if admin_p %}
+			<button class="btn btn-sm btn-success ml-4 float-right mt-1" type="button" data-toggle="modal" data-target="#apresentacao"><span class="fa fa-fw fa-window-maximize"></span> Apresentação</button>
+		{% endif %}
+		<div class="d-flex justify-content-between align-items-center" aria-expanded="{% if election.result_released_at %}true{% else %}false{% endif %}" data-toggle="collapse" data-target=".apuracao-collapse">
+			<h3>Apuração</h3>
+			<div>
+				<span class="fas fa-chevron-right"></span>
+				<span class="fas fa-chevron-down"></span>
+			</div>
+		</div>
+		{% if admin_p %}
+			<div class="modal fade" id="apresentacao" tabindex="-1" role="dialog">
+				<div class="modal-dialog modal-full" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title" id="exampleModalLabel">Resultado</h3>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="card bg-light">
+											<ul class="list-group list-group-flush bg-light">
+												{% for question in election.pretty_result %}
+													<li class="list-group-item bg-light h5 font-weight-bold" data-toggle="collapse" data-target="#result_{{forloop.counter}}">
+														<span>{{question.question}}</span>
+													</li>
+												{% endfor %}
+											</ul>
+										</div>
+									</div>
+									<div class="col-md-8">
+										<div class="accordion" id="resultados">
+											{% for question in election.pretty_result %}
+												<div class="card collapse" id="result_{{forloop.counter}}" data-parent="#resultados">
+													<div class="card-header">
+														<span class="font-weight-bold d-block h4">{{question.question}}</span>
+													</div>
+													<ul class="list-group list-group-flush">
+														{% for answer in question.answers %}
+															<li class="list-group-item d-flex justify-content-between align-items-center h5">
+																<span>{{answer.answer}}</span>
+																<span class="badge badge-pill badge-primary">{{answer.count}}</span>
+															</li>
+														{% endfor %}
+													</ul>
+												</div>
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-danger" data-dismiss="modal"><span class="fa fa-fw fa-times"></span> Fechar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+		<div class="ml-3 row row-cols-1 row-cols-md-1 apuracao-collapse multi-collapse collapse{% if election.result_released_at %} show{% endif %}">
+			{% for question in election.pretty_result %}
+			<div class="col mb-4">
+				<div class="card">
+					<div class="card-header">
+						<span class="font-weight-bold d-block">{{question.question}}</span>
+						<small class="text-muted d-block">Questão #{{forloop.counter}}</small>
+					</div>
+					<ul class="list-group list-group-flush">
+						{% for answer in question.answers %}
+							<li class="list-group-item d-flex justify-content-between align-items-center">
+								<span class="{{ answer.status }}">{{answer.answer}}</span>
+								<span class="badge badge-pill badge-primary">{{answer.count}}</span>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	{% else %}
+		{% if election.voting_has_stopped %}
+			<span class="highlight-box round">
+				Eleição fechada. O resultado será liberado logo.
+			</span>
+			<br /><br />
+		{% else %}
+			{% if election.voting_has_started and eligible_p %}
+				<div class="m-3 text-center">
+					<a class="btn btn-lg btn-primary" href="{{test_cookie_url}}"><span class="fa fa-fw fa-vote-yea"></span> Votar nesta {{election.pretty_type}}</a>
+				</div>
+				{% if election.voting_extended_until %}
+					Esta {{election.pretty_type|lower}} foi inicialmente agendada para terminar em {{ election.voting_ends_at|date:"d/m/Y H:i" }},<br />
+					mas foi estendida até {{ election.voting_extended_until|date:"d/m/Y H:i" }}.
+				{% else %}
+					{% if election.voting_ends_at %}
+						<br />
+						Esta {{election.pretty_type|lower}} está agendada para terminar em {{ election.voting_ends_at|date:"d/m/Y H:i" }}.
+					{% else %}
+						Esta {{election.pretty_type|lower}} será finalizada a critério do administrador.
+					{% endif %}
+					<br />
+				{% endif %}
+				{% if election.private_p and voter %}
+					<br />
+					Esta eleição é <em>privada</em>. Você está conectado como um eleitor apto: <em>{{voter.name}}</em>.
+				{% endif %}
+				<div class="highlight-box round" style="font-size: 1.2em; margin-right: 400px; display:none;" id="nojava_message">
+					Você não tem o Java instalado em seu computador.<br />Por enquanto, o Helios requer Java.<br />
+					Visite <a target="_new" href="http://java.oracle.com">java.oracle.com</a> para instalá-lo.
+				</div>
+				<br />
+			{% else %}
+				{% if eligible_p %}
+					<span class="highlight-box round">
+						Esta eleição ainda não está aberta para votação.
+					</span> <br /><br />
+				{% endif %}
+			{% endif %}
+
+			{% if user %}
+				{% if voter %}
+					<p style="padding-top:1px;">
+						Você está registrado(a) para votar nesta {{election.pretty_type|lower}}.
+						{% if election.use_voter_aliases %}
+							Seu pseudônimo de eleitor é {{voter.alias}}.
+						{% endif %}
+					</p>
+				{% else %}
+					{% if election.result %}
+					{% else %}
+						{% if election.openreg %}
+							{% if eligible_p %}
+								Você está apto(a) a votar nesta {{election.pretty_type|lower}}.
+							{% else %}
+								Você <em>não está</em> apto(a) a votar nesta {{election.pretty_type|lower}}.
+							{% endif %}
+						{% else %}
+							Você <em>não está</em> apto(a) a votar nesta {{election.pretty_type|lower}}.
+							<br />
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% else %}
+				{% if election.openreg %}
+					{% if election.eligibility %}
+						Esta eleição está aberta a: {{election.pretty_eligibility|safe}}
+						<a href="{{settings.SECURE_URL_HOST}}{% url "auth-views-index" %}?return_url={{CURRENT_URL}}">Conecte-se</a> para verificar se você pode votar nesta eleição.
+					{% else %}
+						Qualquer pessoa pode votar nesta eleição.
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+
+	{% if admin_p and election.voting_ends_at and not election.tallying_started_at and election.frozen_at %}
+		<br /><a class="btn btn-primary" href="{% url 'one-election-extend' election.uuid %}"><span class="fas fa-fw fa-stopwatch"></span>Estender Votação</a><br />
+	{% endif %}
+
+	<div class="card mt-4">
+		<div class="card-header" data-toggle="collapse" data-target="#auditoria">Informações de Auditoria</div>
+		<div class="card-body collapse" id="auditoria">
+			<div id="auditbody">
+				<p>URL da Eleição: <a href="{{election.url}}">{{election.url}}</a></p>
+				{% if election.frozen_at %}
+					<div>Código de Identificação da Eleição: <div class="text-monospace font-weight-bold text-nowrap overflow-auto d-md-inline">{{election.hash}}</div></div>
+					{% if votes %}
+						<div>O rastreador da sua cédula é: <strong>{{votes.0.vote_hash}}</strong></div>
+					{% endif %}
+
+					<p>
+						<a class="btn btn-primary" href="{% url 'voters-list-pretty' election.uuid %}">Central de Rastreamento de Cédula</a>
+						{% if election.use_advanced_audit_features %}
+							<a class="btn btn-primary" href="{% url 'one-election-audited-ballots' election.uuid %}">Cédulas Auditadas</a>
+						{% endif %}
+					</p>
+				{% endif %}
+
+				{% if not election.voting_has_started %}
+					<p>
+						<a class="btn btn-primary" href="{{SECURE_URL_HOST}}/booth/vote.html?election_url={% url "one-election" election.uuid %}">Prévia da Cabina</a>
+					</p>
+				{% endif %}
+
+				{% if election.voting_has_stopped %}
+					{% if election.result %}
+						<p>Conferir a <a target="_blank" href="/verifier/verify.html?election_url={% url "one-election" election.uuid %}">apuração da eleição</a>.</p>
+					{% endif %}
+					<p>Avalie a <a href="{{vote_url}}">cabina de votação</a>.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock %}

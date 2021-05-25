@@ -1,0 +1,32 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: nginx
+  namespace: helio
+  labels:
+    app: helios-nginx
+spec:
+  replicas: 1
+  selector:
+    deployment-config.name: nginx
+  template:
+    metadata:
+      labels:
+        deployment-config.name: nginx
+    spec:
+      volumes:
+      - name: static
+        persistentVolumeClaim:
+          claimName: helios-dados-claim
+      containers:
+      - image: angelodias/custom:41
+        name: nginx
+        volumeMounts:
+          - name: static
+            mountPath: /usr/share/nginx/html
+        ports:
+        - name: 'web'
+          containerPort: 8080
+          protocol: TCP
+   
+

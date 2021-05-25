@@ -1,0 +1,39 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Computar Apuração Cripografada para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Computar Apuração</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+<h2 class="title">Computar Apuração para a Eleição: {{election.name}}</h2>
+
+<div id="instructions">
+{% if election.num_cast_votes %}
+	<p>Você está prestes a computar a apuração criptografada para a eleição <b>{{election.name}}</b>.</p>
+
+	<p>Após esta ação, os eleitores não conseguirão mais votar.</p>
+
+	<form method="post" action="" onsubmit="alert('ok, apuração iniciada!')" class="pretty">
+		<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+
+		<button class="btn btn-primary" type="submit"><span class="fa fa-fw fa-check"></span> Computar apuração criptografada!</button>
+		<a class="btn btn-danger" href="./view"><span class="fa fa-fw fa-times"></span> Deixar para depois</a>
+	</form>
+{% else %}
+	<p>
+		Nenhum voto foi depositado nesta eleição. Ao menos um voto precisa ser depositado antes de você computar a apuração.<br />
+		<a href="./view"><span class="fa fa-fw fa-arrow-left"></span>Voltar para a eleição</a>
+	</p>
+{% endif %}
+</div>
+
+<br /><br />
+{% endblock %}

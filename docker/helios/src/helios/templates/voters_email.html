@@ -1,0 +1,79 @@
+{% extends TEMPLATE_BASE %}
+{% load tjpr_form %}
+
+{% block title %}Contactar Eleitores para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-list-pretty' election.uuid %}">Eleitores e Cédulas</a></li>
+			<li class="breadcrumb-item active">Envio de E-mail</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<script>
+		var voter_id = null;
+		{% if voter %}
+			voter_id = '{{voter.voter_id}}';
+		{% endif %}
+	</script>
+
+	<h2 class="title">{{election.name}} &mdash; Contactar Eleitores</h2>
+
+	{% if voter %}
+		<div class="text-center h5 m-3">
+			Você está enviando este e-mail para: <b>{{voter.name}} ({{voter.voter_id}})</b>
+		</div>
+	{% endif %}
+
+	<div class="card">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs">
+			{% for template_option in templates %}
+				<li class="nav-item">
+					{% if template_option.0 == template %}
+						<a class="nav-link active" href="#">{{template_option.1}}</a>
+					{% else %}
+						<a class="nav-link" href="?template={{template_option.0}}&voter_id={{voter.voter_login_id}}">{{template_option.1}}</a>
+					{% endif %}
+				</li>
+			{% endfor %}
+			</ul>
+		</div>
+		<div class="card-body">
+			<h5 class="card-title"><strong>Assunto:</strong> {{default_subject}}</h5>
+			<p class="card-text">
+				<div class="panel border p-3">
+					{{default_body|safe}}
+				</div>
+			</p>
+		</div>
+		<div class="card-footer">
+			<p>Você pode ajustar o assunto e incluir uma mensagem personalizada através do formulário abaixo</p>
+
+			<form action="" method="POST" id="email_form">
+				<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+				<input type="hidden" name="template" value="{{template}}" />
+				<input type="hidden" name="voter_id" value="{{voter.voter_login_id}}" />
+				{% tjpr_form email_form %}
+				<div class="text-right">
+					<button class="btn btn-primary" type="submit"><span class="fa fa-fw fa-envelope"></span> Enviar e-mails</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div id="processing"></div>
+
+	<div id="done" style="display:none;">
+		Pronto, ir <a href="{% url 'one-election-view' election.uuid %}">voltar para a eleição</a>.
+	</div>
+
+	<div id="error" style="display:none;">
+		Erro enviando e-mail aos participantes. Verifique as configurações do servidor e certifique-se de que há um servidor SMTP.
+	</div>
+{% endblock %}

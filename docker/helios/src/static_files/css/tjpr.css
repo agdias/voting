@@ -1,0 +1,75 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 50px;
+  /* background-color: #dbdcdd; */
+}
+
+footer.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 50px;
+	background-color: #dbdcdd;
+	border-top: 1px solid black;
+}
+
+nav.navbar {
+	background-color: #123141;
+}
+
+#answer_form li.selected {
+	font-weight: bold;
+}
+
+img.small-logo {
+	height: 15px;
+}
+
+nav.top-bar, section.top-bar-section ul li a:not(.button), .no-js .top-bar-section ul li:hover > a {
+	background-color: #123141;
+}
+
+.no-js .top-bar-section ul li:hover > a {
+	background-color: #052434;
+}
+
+section.top-bar-section ul li.divider {
+	border-right: 1px solid #2C4B5B;
+	border-left: none;
+}
+
+.winner {
+	font-weight: bold;
+}
+
+.tie {
+	font-weight: bold;
+	font-style: italic;
+	color: gray;
+}
+
+.loser {
+	color: gray;
+}
+
+.modal-full {
+    min-width: 100%;
+    margin: 0;
+}
+
+.modal-full .modal-content {
+    min-height: 100vh;
+}
+
+div[aria-expanded=true] .fa-chevron-right {
+   display: none;
+}
+
+div[aria-expanded=false] .fa-chevron-down {
+   display: none;
+}

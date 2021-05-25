@@ -1,0 +1,35 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Novo Integrante da Comissão Eleitoral de {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'list-trustees-view' election.uuid %}">Comissão Eleitoral</a></li>
+			<li class="breadcrumb-item active">Novo Integrante da Comissão Eleitoral</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Novo Integrante da Comissão Eleitoral</h2>
+
+	<form method="post" action="">
+		<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+		<div class="form-group">
+			<label for="name">Nome</label>
+			<input type="text" class="form-control" name="name" id="name" placeholder="Nome do integrante da Comissão Eleitoral">
+		</div>
+		<div class="form-group">
+			<label for="email">E-mail</label>
+			<input type="email" class="form-control" name="email" id="email" placeholder="email@example.com">
+		</div>
+
+		<div class="text-right">
+			<button class="btn btn-success" type="submit"><span class="fa fa-fw fa-plus"></span> Adicionar Integrante da Comissão Eleitoral</button>
+			<a class="btn btn-danger" href="{% url 'list-trustees-view' election.uuid %}"><span class="fa fa-fw fa-times"></span> Cancelar</a>
+		</div>
+	</form>
+{% endblock %}

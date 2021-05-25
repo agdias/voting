@@ -1,0 +1,11 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+	<h2 class="title">Eleição {{election.name}} já apurada</h2>
+
+	<p>Esta eleição já foi apurada, você não pode mais votar.</p>
+
+	<p>
+		<a href="{% url "one-election-view" election.uuid %}">ver a apuração da eleição</a>
+	</p>
+{% endblock %}

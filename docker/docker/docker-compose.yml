@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  helios:
+    image: helios:alpine-staged
+    build:
+      dockerfile: ./docker/helios/Dockerfile
+      context: ..
+    env_file: ./helios/helios.env
+    volumes:
+#      - ../src:/app
+      - static_content:/dados
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+      - broker
+  
+  nginx:
+    image: nginx:1.17.9
+    volumes:
+      - ./helios/nginx.conf:/etc/nginx/nginx.conf
+      - static_content:/usr/share/nginx/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+      - broker
+      - helios
+
+  database:
+    image: postgres:9.4
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: helios
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  broker:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+ 
+volumes:
+  static_content:

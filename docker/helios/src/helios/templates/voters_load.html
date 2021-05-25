@@ -1,0 +1,55 @@
+{% extends TEMPLATE_BASE %}
+{% load tjpr_form %}
+
+{% block title %}Inclusão de Eleitores para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-list-pretty' election.uuid %}">Eleitores e Cédulas</a></li>
+			<li class="breadcrumb-item active">{{ plugin.name }}</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h3>{{election.name}} &mdash; Inclusão de Eleitores</h3>
+
+	{% if not election.openreg %}
+		<h4 class="mt-3">Carregar dados de {{ plugin.name }}</h4>
+		{% if plugin.has_single %}
+			<div class="card mt-4">
+				<div class="card-header">Inclusão individual</div>
+				<div class="card-body">
+					<form class="form-horizontal" method="post" action="">
+						{% tjpr_form plugin.single_form 'horizontal' %}
+						<button type="submit" class="btn btn-sm btn-primary">
+							<span class="fa fa-fw fa-plus"></span> Adicionar
+						</button>
+					</form>
+				</div>
+			</div>
+		{% endif %}
+		{% if plugin.has_category %}
+			<div class="card mt-4">
+				<div class="card-header">Inclusão por Categoria</div>
+				<div class="card-body">
+					{% for category_form in plugin.category_forms %}
+						<div class="card mt-4">
+							<div class="card-body">
+								<form class="form-horizontal" method="post" action="">
+									{% tjpr_form category_form 'horizontal' %}
+									<button type="submit" class="btn btn-sm btn-primary">
+										<span class="fa fa-fw fa-plus"></span> Carregar
+									</button>
+								</form>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+{% endblock %}

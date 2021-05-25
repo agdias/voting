@@ -1,0 +1,35 @@
+<h3>Sua Cédula Auditada</h3>
+
+<p>
+	<b><u>IMPORTANTE</u></b>: esta cédula, agora que foi auditada, <em>não será considerada na apuração</em>.<br />
+	Para depositar uma cédula, você deve clicar em "Voltar para a Votação" e clicar em "Enviar este Voto!", ao invés de clicar em "Auditar".
+</p>
+
+<p>
+	<b>Por que?</b> O sistema de Eleições não deixa você auditar e depositar a mesma cédula para fornecer alguma proteção contra coerção na hora do voto.
+</p>
+
+<p>
+	<b>E agora?</b> <a onclick="$('#audit_trail').select(); return false;" href="#">Selecione a informação de auditoria da sua cédula</a> abaixo, copie para sua área de transferência e depois use o <a target="_blank" href="single-ballot-verify.html?election_url={{:election_url}}">verificador de cédula</a> para verificá-la.<br />
+	Assim que estiver satisfeito, clique em "voltar para a votação" para re-criptografar sua cédula e depositá-la na urna.
+</p>
+
+<form action="#">
+	<div class="form-group">
+		<textarea name="audit_trail" id="audit_trail" class="form-control" rows="10" style="font-family: monospace;">{{:audit_trail}}</textarea>
+	</div>
+
+	<br /><br />
+	Antes de voltar para a cabina de votação, você pode postar esta cédula auditada na Central de Rastreamento do sistema de Eleições, assim outros podem também checar a verificação da mesma.
+	<br /><br />
+
+	<b>Mesmo que você poste sua cédula auditada, você deve voltar para a cabina de votação e depositar sua cédula para que seu voto seja contabilizado.</b>
+
+	<br /><br />
+	<button type="button" class="btn btn-primary" onclick="BOOTH.reset_ciphertexts();BOOTH.seal_ballot();"><span class="fa fa-fw fa-arrow-left"></span> Voltar para a Votação</button>
+	<button type="button" class="btn btn-success" onclick="$(this).attr('disabled', 'disabled');BOOTH.post_audited_ballot();"><span class="fa fa-fw fa-file-import"></span> Postar Cédula Auditada</button>
+</form>
+
+
+
+

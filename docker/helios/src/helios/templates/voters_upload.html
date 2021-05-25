@@ -1,0 +1,67 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Inclusão de Eleitores para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-list-pretty' election.uuid %}">Eleitores e Cédulas</a></li>
+			<li class="breadcrumb-item active">Envio de Arquivo</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Envio de Arquivo de Eleitores</h2>
+
+	<div>
+		Se você quiser especificar sua lista de eleitores por nome e endereço de e-mail, você pode
+		enviar um arquivo com esta lista aqui. <br/>
+
+		Por favor, prepare um arquivo de texto separado por vírgulas com os seguintes campos:
+	</div>
+	<pre class="border">
+		<code>
+			&lt;login&gt;,&lt;e-mail&gt;,&lt;nome completo&gt;</code>
+	</pre>
+
+	<div>
+		Por exemplo:
+	</div>
+	<pre class="border">
+		<code>
+			benadida,ben@adida.net,Ben Adida
+			bobsmith,bob@acme.org,Bob Smith
+			...</code>
+	</pre>
+
+	<p>
+		O modo mais fácil de preparar um arquivo deste tipo é utilizar um programa de planilhas e exportar o arquivo para o formato "CSV".
+	</p>
+
+	{% if error %}
+		<div style="color: red;">{{error}}</div>
+	{% endif %}
+
+	<form method="post" action="" id="upload_form" enctype="multipart/form-data">
+		<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+		<div class="row">
+			<div class="custom-file col-6">
+				<input type="file" class="custom-file-input" id="voters_file" name="voters_file" lang="pt" accept="text/csv"/>
+				<label class="custom-file-label" for="voters_file" data-browse="Selecionar">Escolher arquivo</label>
+			</div>
+			<div class="col">
+				<button type="submit" class="btn btn-primary"><span class="fa fa-fw fa-file-import"></span> Enviar</button>
+			</div>
+		</div>
+	</form>
+
+	<div id="processing"></div>
+
+	<div id="done" style="display:none;">
+		Envio concluído<br />
+		Agora você pode <a href="./manage">visualizar a lista de eleitores</a>.
+	</div>
+{% endblock %}

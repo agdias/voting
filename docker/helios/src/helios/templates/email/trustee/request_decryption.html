@@ -1,0 +1,11 @@
+{% extends 'email/email-base.html' %}
+
+{% block content %}
+	<p>Caro integrante da Comissão Eleitoral,</p>
+
+	<p>O período de votação para a Eleição <strong>{{ election.name }}</strong> já se encerrou. Para dar continuidade à apuração dos votos, é preciso que você forneça a sua parte da descriptografia.</p>
+	<p>Para fazer isto, basta acessar o link <a href="{{ url }}">{{ url }}</a> e seguir as instruções fornecidas em tela.</p>
+	<p>É importante ressaltar que sem esta ação, não será possível completar a apuração desta eleição.</p>
+	<br/>
+	<p>Caso necessite de auxílio para o procedimento de descriptografia com as chaves, o passo a passo é detalhado nesta seção da ajuda: <a href="{{ host }}/static/ajuda/gestor/apurador-descriptografar.html">{{ host }}/static/ajuda/gestor/apurador-descriptografar.html</a></p>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Descriptografar Resultados da Eleição{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="./home">Página do Integrante da Comissão Eleitoral</a></li>
+			<li class="breadcrumb-item active">Descriptografar Resultados</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<script language="javascript">
+		var ELECTION_JSON = {{election.toJSON|safe}};
+		var TALLY_JSON = {{election.encrypted_tally.toJSON|safe}};
+	</script>
+	<script language="javascript" src="/static/js/key_util.js"></script>
+	<script language="javascript" src="/static/js/trustee_decrypt_and_prove.js"></script>
+
+	<h2 class="title">Integrante da Comissão Eleitoral {{trustee.name}} &mdash; Descriptografar Resultados para {{election.name}}</h2>
+	<p>
+		<b>Integrante da Comissão Eleitoral:</b> <span class="text-monospace">{{trustee.email}}</span><br />
+		<b>Código de Identificação da Chave Pública:</b> <span class="text-monospace">{{trustee.public_key_hash}}</span><br />
+		<b>Código de Identificação da Apuração Criptografada:</b> <span class="text-monospace">{{election.encrypted_tally_hash}}</span>
+	</p>
+
+	<p>
+		A apuração criptografada da sua eleição foi computada.<br />
+		Agora é hora de computar e enviar sua descriptografia parcial.
+	</p>
+
+	<p>
+		Este processo é executado em dois passos.<br /><br />
+		<b>Primeiro</b>, sua chave privada é utilizada para descriptografar a apuração <em>dentro</em> do seu navegador, sem conectar-se com a rede.<br />
+		Você pode escolher deixar o navegador "offline" para este passo, se preferir.<br /><br />
+		<b>Segundo</b>, uma vez que seus fatores de descriptografia forem computados, seu navegador precisará ficar "online" para que sejam enviados ao servidor.<br />
+		Se preferir, você pode computar seus fatores de descriptografia, copiá-los para a área de transferência, reiniciar seu navegador, e<br />
+		pular para o segundo passo, de modo que seu navegador nunca estará online quando você informar sua chave privada.
+	</p>
+
+	<div id="sk_section" style="display:none;">
+
+		<form onsubmit="return false;">
+			<h5>PRIMEIRO PASSO: informe sua chave secreta</h5>
+			<div class="ml-3">
+				<div class="">
+					<div class="custom-file col-6">
+						<input type="file" class="custom-file-input" id="secret_key_file" name="secret_key_file" lang="pt" accept="text/plain"/>
+						<label class="custom-file-label" for="secret_key_file" data-browse="Selecionar">Escolha o arquivo da sua chave secreta</label>
+					</div>
+					<div id="valid-file" class="ml-2" style="display: none;">
+						<span class="ml-1"><span class="fas fa-fw fa-check text-success"></span> O arquivo informado é válido.</span>
+					</div>
+					<div id="invalid-file" class="ml-2" style="display: none;">
+						<span class="ml-1"><span class="fas fa-fw fa-times text-danger"></span> O arquivo informado não é válido. Tente novamente.</span>
+					</div>
+				</div>
+				<div class="mt-3 mb-3">
+					<span class="font-weight-bold">OU</span>, se preferir <a href="javascript:show_secret_key_content();">informe o conteúdo do arquivo da sua chave</a>.
+				</div>
+				<div id="key-by-content" style="display: none;">
+					<span>Conteúdo da sua chave secreta</span>
+					<textarea id="sk_textarea" class="form-control text-monospace" cols="60" rows="5" style="height: 15em;" placeholder="Cole aqui o conteúdo do arquivo da sua chave secreta"></textarea>
+				</div>
+			</div>
+		</form>
+		<p id="tally_section">
+			<button class="btn btn-primary m-3" onclick="do_tally();"><span class="fa fa-fw fa-key"></span> Gerar minha parte da descriptografia</button>
+		</p>
+
+		<div id="skip_to_second_step_instructions">
+			<a href="javascript:skip_to_second_step();">Pular para o segundo passo <span class="fa fa-fw fa-arrow-right"></span></a>
+			<div class="text-muted">(você precisa já ter computado os fatores de descriptografia.)</div>
+		</div>
+	</div>
+
+	<div id="waiting_div" class="panel">
+		<div class="text-center m-5">
+			<div class="spinner-border" role="status"></div>
+			<div class="text-center text-muted">
+				Gerando os fatores de descriptografia parcial e provas...
+			</div>
+		</div>
+	</div>
+
+	<div id="waiting_submit_div" class="panel">
+		<div class="text-center m-5">
+			<div class="spinner-border" role="status"></div>
+			<div class="text-center text-muted">
+				Enviando e checando seus fatores de descriptografia e provas...
+			</div>
+		</div>
+	</div>
+
+	<div id="result_div">
+		<h5>SEGUNDO PASSO: carregar sua descriptografia parcial</h5>
+		<p id="first-step-success" style="display: none;">
+			Seus fatores de descriptografia parcial e provas foram gerados abaixo.<br />
+			Sua chave privada foi removida da memória.<br />
+			Quando estiver pronto, você pode submeter este resultado ao servidor.
+		</p>
+		Sua descriptografia parcial:<br />
+		<p>
+			<textarea id="result_textarea" class="form-control text-monospace" cols="60" rows="5" wrap="soft" style="height: 15em;"></textarea>
+			<button class="btn btn-primary m-3" onclick="submit_result();"><span class="fa fa-fw fa-cloud-upload-alt"></span> Enviar os fatores de descriptografia para o servidor</button>
+			<a class="btn btn-danger m-3" href="javascript:reset()"><span class="fa fa-fw fa-redo"></span> Restaurar e reiniciar o processo de descriptografia</a>
+		</p>
+	</div>
+
+	<div id="done_div">
+		<h5>Pronto!</h5>
+		<a href="{% url 'one-election-view' election.uuid %}"><span class="fa fa-fw fa-arrow-left"></span>Voltar para a eleição</a></a>
+	</div>
+
+	<div id="error_div">
+		Erro: sua chave privada provavelmente está incorreta.
+	</div>
+
+	<div id="applet_div"></div>
+
+{% endblock %}

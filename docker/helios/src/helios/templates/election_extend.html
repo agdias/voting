@@ -1,0 +1,28 @@
+{% extends TEMPLATE_BASE %}
+{% load tjpr_form %}
+
+{% block title %}Questões para {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Estender Votação</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Estender Votação</h2>
+
+	<form class="prettyform" action="" method="POST" id="edit_election_form">
+		<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+		<table class="pretty">
+			{% tjpr_form election_form 'horizontal' %}
+		</table>
+		<div>
+			<button class="btn btn-success" type="submit"><span class="fas fa-fw fa-stopwatch"></span> Estender</button>
+		</div>
+	</form>
+{% endblock %}

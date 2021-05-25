@@ -1,0 +1,88 @@
+<form onsubmit="return false;" class="prettyform" id="answer_form">
+	<input type="hidden" name="question_num" value="{{:question_num}}" />
+	<div class="card">
+		<div class="card-header">
+			<div class="font-weight-bold">{{:question.question}}</div>
+			<div class="text-muted small">
+				selecione
+				{{if question.min == question.max}}
+					{{if question.min == 1}}
+						apenas uma opção
+					{{else}}
+						{{:question.min}} opções
+					{{/if}}
+				{{else}}
+					{{if question.min == 0}}
+						{{if question.max}}
+							até
+							{{if question.max == 1}}
+								uma opção
+							{{else}}
+								{{:question.max}} opções
+							{{/if}}
+						{{else}}
+							quantas opções desejar
+						{{/if}}
+					{{else}}
+						{{if question.max}}
+							entre {{:question.min}} e {{:question.max}} opções
+						{{else}}
+							no mínimo
+							{{if question.max == 1}}
+								uma opção
+							{{else}}
+								{{:question.min}} opções
+							{{/if}}
+						{{/if}}
+					{{/if}}
+				{{/if}}
+			</div>
+		</div>
+		<ul class="list-group list-group-flush">
+			{{for question.answers}}
+				<li class="list-group-item" id="answer_label_{{:~root.question_num}}_{{:~root.answer_ordering[#index]}}">
+					<div class="row">
+						<div class="col form-check">
+							<input type="checkbox" class="ballot_answer form-check-input" id="answer_{{:~root.question_num}}_{{:~root.answer_ordering[#index]}}" name="answer_{{:~root.question_num}}_{{:~root.answer_ordering[#index]}}" value="yes" onclick="BOOTH.click_checkbox({{:~root.question_num}}, {{:~root.answer_ordering[#index]}}, this.checked);" />
+							<label class="answer form-check-label stretched-link" for="answer_{{:~root.question_num}}_{{:~root.answer_ordering[#index]}}">
+								{{:~root.question.answers[~root.answer_ordering[#index]]}}
+							</label>
+						</div>
+						{{if ~root.question.answer_urls && ~root.question.answer_urls[~root.answer_ordering[#index]] && ~root.question.answer_urls[~root.answer_ordering[#index]] != ""}}
+							<span class="small">
+								<a class="btn btn-sm btn-primary" target="_blank" href="{{:~root.question.answer_urls[~root.answer_ordering[#getIndex()]]}}" rel="noopener noreferrer"><span class="fas fa-fw fa-info"></span></a>
+							</span>
+						{{/if}}
+					</div>
+				</li>
+			{{/for}}
+		</ul>
+	</div>
+
+	<div class="alert alert-success m-3 d-none" role="alert" id="warning_box"/>
+
+	<div class="mt-4">
+		{{if show_reviewall}}
+			<button class="btn btn-success float-right ml-2" id="nextStep" onclick="BOOTH.validate_and_confirm({{:question_num}});">
+				Próximo passo
+				<span class="fas fa-fw fa-step-forward"></span>
+			</button>
+		{{/if}}
+
+		{{if question_num != 0}}
+			<button class="btn btn-md-sm btn-primary float-left" id="previousQuestion" onclick="BOOTH.previous({{:question_num}})">
+				<span class="fas fa-fw fa-arrow-left"></span>
+				Questão Anterior
+			</button>
+		{{/if}}
+
+		{{if question_num < last_question_num}}
+			<button class="btn btn-primary float-right" id="nextQuestion" onclick="BOOTH.next({{:question_num}})">
+				Próxima Questão
+				<span class="fas fa-fw fa-arrow-right"></span>
+			</button>
+		{{/if}}
+	</div>
+
+	<br clear="both" />
+</form>

@@ -1,0 +1,43 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Gerenciar Eleitores <span style="font-size:0.7em;">[<a href="{% url "one-election-view" election.uuid %}">voltar para a eleição</a>]</span></h2>
+
+	<form method="get" action="{% url "voters-search" election.uuid %}">
+		<b>buscar</b>: <input type="text" name="q" /> <input type="submit" value="buscar" />
+	</form>
+
+	{% if upload_p %}
+		<p><a href="{% url "voters-upload" election_uuid=election.uuid %}">enviar arquivo de eleitores</a></p>
+	{% endif %}
+
+	Eleitores {{offset_plus_one}} - {{offset_plus_limit}} &nbsp;&nbsp;
+
+	{% if next_after %}
+		<a href="./manage?after={{next_after}}&offset={{offset_plus_limit}}">próximo {{limit}}</a> &nbsp;&nbsp;
+	{% endif %}
+
+	{% ifequal offset 0 %}
+	{% else %}
+		<a href="./manage">voltar ao início</a> &nbsp;&nbsp;
+	{% endifequal %}
+	{% if more_p %}
+		<a href="./manage?after={{next_after}}&offset={{next_offset}}">próximo {{limit}}</a>
+	{% endif %}
+
+	<table class="pretty">
+		<tr><th>Pseudônimo</th><th>Nome</th><th>Login</th></tr>
+		{% for voter in voters %}
+			<tr>
+				<td>{{voter.alias}}</td>
+				<td>{{voter.name}}</td>
+				<td>{{voter.voter_id}}
+					{% if election.frozen_at %}
+					{% else %}
+						[<a onclick="return confirm('você tem certeza de que quer remover {{voter.name}} ?');" href="{% url "voter-delete" election.uuid voter.uuid %}">x</a>]
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

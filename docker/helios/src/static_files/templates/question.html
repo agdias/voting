@@ -1,0 +1,59 @@
+<form id="form_question" onsubmit="question_save(); return false;">
+	<input type="hidden" name="question_number" id="question_number" value="{{:~question_number}}"/>
+	<div class="card">
+		<div class="card-header">
+			<div class="font-weight-bold">
+				{{if ~question_number >= 0}}
+					Edição da Questão #{{:~question_number+1}}
+				{{else}}
+					Nova Questão
+				{{/if}}
+			</div>
+			<input type="text" class="form-control" id="question_name" name="question" placeholder="Questão" value="{{:question}}">
+			<div class="form-row align-items-center">
+				<div class="col-auto">
+					Selecione entre
+					<select class="custom-select w-auto" name="min" id="min" data-width="fit">
+						<option selected>0</option>
+						{{for start=1 end=21}}<option>{{:}}</option>{{/for}}
+					</select>
+					e
+					<select class="custom-select w-auto" name="max" id="max">
+						<option>0</option>
+						<option selected>1</option>
+						{{for start=2 end=51}}<option>{{:}}</option>{{/for}}
+						<option value="">- (ilimitado)</option>
+					</select>
+					respostas
+				</div>
+				<div class="col-auto">
+					Tipo de Resultado:
+					<select class="custom-select w-auto" name="result_type" id="result_type">
+						<option value="absolute_max">maioria absoluta</option>
+						<option value="absolute">maioria simples</option>
+						<option value="relative" selected>relativo</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="card-body ml-4">
+			<div id="answers">
+				{{include tmpl="answer" /}}
+			</div>
+			<div class="d-flex justify-content-between align-items-center">
+				<a class="btn btn-success" href="javascript:add_answers(5)"><span class="fa fa-fw fa-plus"></span> Adicionar mais 5 respostas</a>
+				<div>
+					<button type="submit" class="btn btn-primary">
+						<span class="fa fa-fw fa-save"></span> Salvar Questão
+					</button>
+					<a class="btn btn-danger" href="javascript:question_edit_cancel()">
+						<span class="fa fa-fw fa-times"></span> Cancelar
+					</a>
+				</div>
+			</div>
+		</div>
+		<div>
+		</div>
+	</div>
+</form>

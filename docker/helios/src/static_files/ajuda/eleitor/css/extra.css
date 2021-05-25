@@ -1,0 +1,8 @@
+header.md-header {
+    background-color: #123141;
+}
+
+header.md-header nav.md-header-nav a img {
+    width: auto;
+    height: auto;
+}

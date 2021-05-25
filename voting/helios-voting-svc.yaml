@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    deployment-config.name: helios-voting
+  name: helios-voting-svc
+  namespace: helio
+spec:
+  ports:
+  - name: "8000"
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    deployment-config.name: helios-voting
+  type:  ClusterIP

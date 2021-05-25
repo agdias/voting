@@ -1,0 +1,35 @@
+{% extends 'server_ui/templates/base.html' %}
+
+{% block title %}{{ settings.SITE_TITLE }}{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+	<div class="large-12-columns">
+		<div class="row"><h2>Documentação</h2></div>
+		<div class="row">
+			<p>
+				The Helios Voting technology is based on advanced peer-reviewed
+				cryptographic techniques that enable your vote to remain secret while
+				providing an intelligent ballot tracker to let you verify that your
+				ballot was received and counted properly:
+			</p>
+
+			<ul>
+				<li> <a href="http://documentation.heliosvoting.org/">documentação técnica</a></li>
+				<li> <a href="http://www.usenix.org/events/sec08/tech/full_papers/adida/adida.pdf">original revisado em pares (Usenix Security 2008)</a></li>
+				<li> <a href="https://github.com/google/pyrios">Pyrios</a>, biblioteca em Go feita por <a href="http://1.37e2.net/">Tom Roeder</a> que verifica as eleições do Helios.
+				<li> <a href="http://www.uclouvain.be/crypto/electionmonitor/default/about">Monitor de Eleição do Helios</a>, produzido pela Universite Catholique de Louvain.</li>
+			</ul>
+
+			<p>O Helios foi coberto pela imprensa:</p>
+
+			<ul>
+				<li> <a href="http://www.kcbs.com/bayareanews/Tracking-Votes-During-Elections/7161136">KCBS News Interview, May 2010</a></li>
+				<li> <a href="http://harvardmagazine.com/2010/05/secret-ballots-verifiable-votes">Harvard Magazine, April 2010</a></li>
+				<li> <a href="http://www.ynet.co.il/articles/0,7340,L-3720204,00.html">Ynet, Israeli Press, June 2009</a></li>
+			</ul>
+		</div>
+	</div>
+{% endblock %}

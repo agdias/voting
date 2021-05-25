@@ -1,0 +1,65 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Verificar Chave Privada{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="./home">Página do Integrante da Comissão Eleitoral</a></li>
+			<li class="breadcrumb-item active">Verificação da Chave Privada</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<script>
+		var PK_HASH = "{{trustee.public_key_hash}}";
+	</script>
+	<script language="javascript" src="/static/js/key_util.js"></script>
+	<script language="javascript" src="/static/js/trustee_check_sk.js"></script>
+
+	<h2 class="title">{{election.name}} &mdash; Integrante da Comissão Eleitoral {{trustee.name}} &mdash; Verificar Chave Privada</h2>
+
+	<div>O código de identificação de sua chave pública é: <div id="pk_hash" class="text-monospace font-weight-bold text-nowrap overflow-auto d-inline">{{trustee.public_key_hash}}</div></div>
+
+	<div id="loading" class="panel">
+		<div class="text-center m-5">
+			<div class="spinner-border" role="status"></div>
+			<div class="text-center text-muted">
+				carregando funções de criptografia...
+			</div>
+		</div>
+	</div>
+
+	<h5 class="mt-4 mb-2">Validação da Chave</h5>
+	<div id="input" class="mt-2" style="display:none;">
+		<div class="">
+			<div class="custom-file col-6">
+				<input type="file" class="custom-file-input" id="secret_key_file" name="secret_key_file" lang="pt" accept="text/plain"/>
+				<label class="custom-file-label" for="secret_key_file" data-browse="Selecionar">Escolha o arquivo da sua chave secreta</label>
+			</div>
+			<div id="valid-file" class="ml-2" style="display: none;">
+				<span class="ml-1"><span class="fas fa-fw fa-check text-success"></span> O arquivo informado é válido. Prossiga com a verificação da chave.</span>
+			</div>
+			<div id="invalid-file" class="ml-2" style="display: none;">
+				<span class="ml-1"><span class="fas fa-fw fa-times text-danger"></span> O arquivo informado não é válido. Tente novamente.</span>
+			</div>
+		</div>
+		<div class="mt-3 mb-3">
+			<span class="font-weight-bold">OU</span>, se preferir <a href="javascript:show_secret_key_content();">informe o conteúdo do arquivo da sua chave</a>.
+		</div>
+
+		<div id="key-by-content" style="display: none;">
+			<textarea class="form-control text-monospace mb-3" id="sk_textarea" name="secret_key" wrap="soft" style="height: 15em;" placeholder="Cole aqui o conteúdo do arquivo da sua chave secreta"></textarea>
+		</div>
+		<button class="btn btn-primary" onclick="check_sk();"><span class="fa fa-fw fa-key"></span> Verificar</button>
+	</div>
+
+	<div id="processing" style="display:none;">verificando sua chave privada...</div>
+
+	<div class="font-weight-bold text-center h4 mt-5" id="result"></div>
+	<div class="text-center" id="reset_link" style="display: none;">
+		<a class="btn btn-primary" href="javascript:reset();"><span class="fa fa-fw fa-redo"></span> Tente novamente</a>
+	</div>
+	<div id="applet_div"></div>
+{% endblock %}

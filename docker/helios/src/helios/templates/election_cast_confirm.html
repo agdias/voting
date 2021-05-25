@@ -1,0 +1,117 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Confirmar Voto{% endblock %}
+
+{% block content %}
+<script language="javascript">
+
+// $(document).ready(function() {
+//	 $('#waiting_div').hide();
+// });
+
+window.onload = function() {
+	console.log('Onload.....');
+	if (document.readyState != 'loading'){
+		startSetup();
+	} else {
+		document.addEventListener('DOMContentLoaded', startSetup);
+	}
+}
+
+function startSetup() {
+	$('#waiting_div').hide();
+}
+
+function show_waiting() {
+	$('#all_forms').hide();
+	$('#waiting_div').show();
+}
+
+// FIXME: set this to false once it's clear how to set it back to true
+// so that it's not easy to forget to cast a ballot
+var ready_to_unload = true;
+
+window.onbeforeunload = function(evt) {
+	if (ready_to_unload)
+		return;
+
+	if (typeof evt == 'undefined') {
+		evt = window.event;
+	}
+
+	var message = "Você ainda NÃO DEPOSITOU sua cédula na urna! Se você quiser que seu voto seja considerado, então complete todo o processo.";
+
+	if (evt) {
+		evt.returnValue = message;
+	}
+
+	return message;
+};
+</script>
+<p style="margin-top: 10px">Enviando o seu voto para <b>{{election.name}}</b>...</p>
+
+<div id="waiting_div" class="panel">
+	<div class="text-center m-5">
+		<h4>Verificando e depositando sua cédula</h4>
+		<div class="spinner-border" role="status"></div>
+	</div>
+</div>
+
+<div id="all_forms">
+	{% if voter %}
+		{% include "_castconfirm_docast.html" %}
+	{% else %}
+		{% if show_password %}
+			{% if user %}
+				<h1>Espere!</h1>
+				<p>
+				Você está conectado como <u>{{user.display_html_small|safe}}</u>, mas esta eleição exige<br />
+				credenciais específicas.
+				</p>
+			{% endif %}
+
+			{% with cast_ballot="1" %}
+				{% include "_castconfirm_password.html" %}
+			{% endwith %}
+		{% else %}
+			{% if user %}
+				<h1>Desculpe!</h1>
+				<b>Desculpe, você <em>
+				{% if election.openreg %}
+					<u>não está apto</u></em> a votar nesta eleição.
+				{% else %}
+					não está registrado</em> para votar nesta eleição, e o registro está encerrado.
+				{% endif %}
+				</b><br /></p>
+				<p>
+					[<a href="{% url "one-election-view" election.uuid %}">retornar para a página da eleição</a>]
+				</p>
+			{% else %}
+				<p>
+				<h1>Espere! Você precisa conectar-se.</h1>
+				{% if election.openreg %}
+
+					{% if election.eligibility %}
+					{% else %}
+						Esta eleição está aberta para <em>todos</em>, então conecte com sua conta de preferência.
+					{% endif %}
+
+				{% else %}
+					Esta eleição está aberta para <em>eleitores registrados</em>, portanto conecte-se com a mesma conta com a qual você se registrou.
+				{% endif %}
+				</p>
+
+				{{login_box|safe}}
+
+				<br />
+				Não se preocupe, sua cédula será preservada enquanto você se conecta.
+			{% endif %}
+		{% endif %}
+		<br />
+		O número do rastreador da sua cédula é:<br /><br />
+		<tt style="font-size:1.3em; font-weight: bold; padding-left: 20px;">  {{vote_fingerprint}}</tt>
+		</p>
+		{# this closes the IF ELSE of this being password_only #}
+	{% endif %}
+</div>
+
+{% endblock %}

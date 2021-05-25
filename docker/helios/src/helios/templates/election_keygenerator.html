@@ -1,0 +1,118 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Configuração de Chave{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="./home">Página do Integrante da Comissão Eleitoral</a></li>
+			<li class="breadcrumb-item active">Configuração de Chave</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<script language="javascript">
+		var ELGAMAL_PARAMS_JSON = {{eg_params_json|safe}};
+	</script>
+
+	<script language="javascript" src="/static/js/Blob.js"></script>
+	<script language="javascript" src="/static/js/FileSaver.js"></script>
+	<script language="javascript" src="/static/js/key_util.js"></script>
+	<script language="javascript" src="/static/js/election_keygenerator.js"></script>
+
+	<h2 class="title">{{election.name}} &mdash; Integrante da Comissão Eleitoral {{trustee.name}} &mdash; Configuração de Chave</h2>
+
+	<p>Como integrante da Comissão Eleitoral, é hora de configurar sua chave para essa eleição.</p>
+
+	<p id="waiting_message">Por favor, aguarde enquanto o gerador é carregado...</p>
+
+	<div id="generator">
+		<button class="btn btn-success" onclick="generate_keypair(); return false;" id="generate_button"><span class="fa fa-fw fa-key"></span> Gerar Chaves da Eleição</button>
+		<div class="mt-1">Se você já gerou um par de chaves, você pode <a href="javascript:show_key_reuse()">reutilizá-lo</a>.</div>
+	</div>
+
+	<div class="mt-4" id="reuse">
+		<h4>Reutilizando uma Chave</h4>
+
+		<div class="ml-2">
+			<div>
+				<div class="custom-file col-6">
+					<input type="file" class="custom-file-input" id="secret_key_file" name="secret_key_file" lang="pt" accept="text/plain"/>
+					<label class="custom-file-label" for="secret_key_file" data-browse="Selecionar">Escolha o arquivo da sua chave secreta para reutilizá-la</label>
+				</div>
+				<div id="valid-file" class="ml-2" style="display: none;">
+					<span class="ml-1"><span class="fas fa-fw fa-check text-success"></span> O arquivo informado é válido. Siga com o procedimento.</span>
+				</div>
+				<div id="invalid-file" class="ml-2" style="display: none;">
+					<span class="ml-1"><span class="fas fa-fw fa-times text-danger"></span> O arquivo informado não é válido. Tente novamente.</span>
+				</div>
+			</div>
+			<div class="mt-3 mb-3">
+				<span class="font-weight-bold">OU</span>, se preferir <a href="javascript:show_secret_key_content();">informe o conteúdo do arquivo da sua chave</a>.
+			</div>
+
+			<div id="key-by-content" style="display: none;">
+				<textarea class="form-control text-monospace mb-3" cols="80" rows="5" wrap="soft" id="sk_textarea" name="secret_key" style="width: 60%;" placeholder="Cole aqui o conteúdo do arquivo da sua chave secreta"></textarea>
+			</div>
+
+			<button class="btn btn-primary" onclick="reuse_key();"><span class="fa fa-fw fa-recycle"></span> Reutilizar</button>
+			<button class="btn btn-danger" onclick="cancel_reuse();"><span class="fa fa-fw fa-times"></span> Cancelar</button>
+		</div>
+
+
+	</div>
+
+	<div id="sk_download">
+		<h4>Sua Chave Privada</h4>
+		<span id="clear_button">
+			Sua chave foi gerada, mas você pode optar por <a href="javascript:clear_keys();">limpá-la da memória e começar do zero</a> se preferir.<br />
+		</span>
+
+		<div id="show_key">
+			<a class="btn btn-primary mr-3" id="download_to_file" href="javascript:download_sk_to_file('chave_privada_{{election.name}}.txt');"><span class="fa fa-fw fa-file-download"></span>Download da chave privada</a>
+			<button class="btn btn-primary" onclick="download_sk();"><span class="far fa-fw fa-eye"></span> Exibir minha chave privada</button>
+		</div>
+	</div>
+
+	<div style="display:none;" id="pk_content">
+		<div class="mt-3">
+			Abaixo está o conteúdo de sua chave secreta. Por favor, copie seu conteúdo e salve-o de forma segura. <br>
+			Você também pode fazer download para salvá-la em forma de arquivo.
+			E, por favor, não a perca! Caso contrário, não será possível descriptografar a apuração da eleição.<br>
+		</div>
+		<div class="row mt-3">
+			<div class="col">
+				<h5>Conteúdo</h5>
+				<textarea id="sk_content" rows="5" wrap="soft" cols="50" style="height: 25em;"></textarea>
+			</div>
+			<div class="col">
+				<h5>Download do Arquivo</h5>
+				<a class="btn btn-primary" href="javascript:download_sk_to_file('chave_privada_{{election.name}}.txt');"><span class="fa fa-fw fa-file-download"></span>Download da chave privada</a>
+			</div>
+		</div>
+		<p>
+		</p>
+	</div>
+
+	<div class="mt-4" style="display:none;" id="pk_link">
+		<a class="btn btn-success" href="javascript:show_pk();"><span class="fa fa-fw fa-check"></span>Certo, eu salvei a chave, vamos prosseguir</a>
+	</div>
+
+	<form method="post" id="pk_form" action="{% url 'trustee-upload-pk' election.uuid trustee.uuid %}">
+		<h3>Sua Chave Pública</h3>
+		<p>É hora de enviar sua chave pública para o servidor.</p>
+		<div>
+			O código de identificação da sua chave pública é: <div id="pk_hash" class="text-monospace font-weight-bold text-nowrap overflow-auto d-inline"></div>.<br />
+			Você optar por salvar o código para confirmar que a sua chave pública foi adequadamente armazenada no servidor.<br />
+			<div class="text-muted">
+				Sua chave pública não está sendo mostrada no momento porque você não precisa salvá-la, seu código de identificação é suficiente.
+			</div>
+		</div>
+		<textarea id="pk_textarea" name="public_key_json" cols="80" rows="10" style="display:none;"></textarea>
+		<button class="btn btn-primary mt-3" type="submit"><span class="fa fa-fw fa-share"></span> Enviar sua Chave Pública</button>
+	</form>
+
+	<div id="applet_div"></div>
+	<br /><br />
+{% endblock %}

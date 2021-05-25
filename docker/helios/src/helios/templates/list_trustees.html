@@ -1,0 +1,117 @@
+{% extends "helios/templates/cryptobase.html" %}
+
+{% block title %}Comissão Eleitoral de {{election.name}}{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Comissão Eleitoral</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h3 class="title">{{election.name}} &mdash; Comissão Eleitoral</h3>
+
+	<div class="text-justify">
+		Adicione aqui as pessoas que poderão apurar o resultado da eleição. Cada uma das pessoas indicadas como integrante da Comissão Eleitoral
+		receberá um e-mail para que criem seu par de chaves criptográficas e que carreguem sua chave pública para esta eleição.
+		A urna só poderá ser contabilizada para a eleição depois que todos os nembros da Comissão Eleitoral cadastrados entrarem na interface de apuração e fornecerem sua chave privada. ATENÇÃO: Se um integrante da Comissão Eleitoral perder sua chave, a urna não poderá ser aberta e todos os votos serão perdidos.
+	</div>
+
+	<div class="text-justify font-weight-bold mt-3 mb-3">
+		ATENÇÃO: Após adicionar um integrante da Comissão Eleitoral, você deve, obrigatoriamente, clicar no botão "Enviar login", para que o integrante receba o e-mail informando que deve cadastrar sua chave.
+	</div>
+
+	{% if not election.frozen_at %}
+		<div class="text-justify">
+			Se você não quiser cadastrar integrantes da Comissão Eleitoral externos ao sistema, O Helios é, automaticamente, seu primeiro apurador
+			e irá tratar da geração de chaves e da descriptografia automaticamente.
+			<br />
+			Se você cadastrar integrantes da Comissão Eleitoral adicionais, é possível remover o Helios como apurador.<br />
+		</div>
+
+		{% if admin_p %}
+			<div class="mt-3">
+				<button class="btn btn-success" type="button" data-toggle="modal" data-target="#confirmarInclusao"><span class="fa fa-fw fa-plus"></span> Adicionar um integrante da Comissão Eleitoral</button>
+				{% if not election.has_helios_trustee %}
+					<a class="btn btn-primary" href="{% url 'new-trustee-helios' election.uuid %}"><span class="fa fa-fw fa-plus"></span> Adicionar o Helios como apurador</a>
+				{% endif %}
+			</div>
+
+			<div class="modal fade" id="confirmarInclusao" tabindex="-1" role="dialog">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="exampleModalLabel">Adicionar Integrante da Comissão Eleitoral</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body text-justify">
+							<p>Adicionar seus próprios integrantes da Comissão Eleitoral exige mais trabalho para apurar a eleição.</p>
+							<p>Será preciso garantir que os integrantes da Comissão Eleitoral geraram seus pares de chaves e que as chaves privadas estejam resguardadas.</p>
+							<p>Se você não tem certeza do que isto significa, recomendamos fortemente que clique em Cancelar e deixe que o Helios faça a apuração por você.</p>
+						</div>
+						<div class="modal-footer">
+							<a class="btn btn-primary" href="{% url 'new-trustee' election.uuid %}">Continuar</a>
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	{% endif %}
+
+	{% if admin_p and election.encrypted_tally and not election.ready_for_decryption_combination %}
+		<div>Pelo menos um dos integrantes da Comissão Eleitoral ainda não enviou sua parte da descriptografia. Utilize o botão abaixo para, através de e-mail, solicitar que os integrantes que ainda não o fizeram, forneçam sua parte da descriptografia:</div>
+		<div class="text-center">
+			<a class="btn btn-warning" onclick="return confirm('Você tem certeza de que deseja solicitar aos integrantes da Comissão Eleitoral que enviem suas partes da descriptografia?');" href="{% url 'trustees-ask-for-decryption' election.uuid %}"><span class="fa fa-fw fa-envelope"></span> Solicitar descriptografia</a>
+		</div>
+	{% endif %}
+
+	{% if not trustees|length %}
+	{% else %}
+			<div class="mt-3">
+				{% for t in trustees %}
+					<div class="card mb-2">
+						<div class="card-body">
+							<div>
+								<span class="font-weight-bold">Integrante #{{forloop.counter}}: {{t.name}}</span><span class="text-muted"> ({{t.email}})</span>
+							</div>
+
+							<div>
+								{% if t.public_key_hash %}
+									Identificação da Chave Pública: <div class="text-monospace font-weight-bold text-nowrap overflow-auto d-md-inline">{{t.public_key_hash}}</div>
+								{% else %}
+									<span class="text-muted">Nenhuma chave pública enviada ainda.</span>
+								{% endif %}
+							</div>
+
+							{% if election.encrypted_tally %}
+								<div>
+									{% if t.decryption_factors %}
+										<span class="font-weight-bold">A apuração deste integrante já foi registrada.</span>
+									{% else %}
+										<span class="text-muted">Aguardando pela apuração deste integrante.</span>
+									{% endif %}
+								</div>
+							{% endif %}
+							{% if admin_p %}
+								<div class="text-right">
+									{% if not election.frozen_at %}
+										<a class="btn btn-sm btn-danger" onclick="return confirm('{% if t.secret_key %}Você tem certeza de que deseja remover o Helios como apurador?{% else %}Você tem certeza de que deseja remover este integrante da Comissão Eleitoral?{% endif %}');" href="{% url 'delete-trustee' election.uuid %}?uuid={{t.uuid}}"><span class="fa fa-fw fa-times"></span> Excluir</a>
+									{% endif %}
+									{% if not t.secret_key %}
+										<a class="btn btn-sm btn-primary" onclick="return confirm('Você tem certeza de que deseja enviar a URL de acesso para este integrante da Comissão Eleitoral?');" href="{% url 'trustee-send-url' election.uuid t.uuid %}"><span class="fa fa-fw fa-user-shield"></span> Enviar login</a>
+									{% endif %}
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+	{% endif %}
+{% endblock %}

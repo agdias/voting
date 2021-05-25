@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Cabina de Votação</title>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/vote.css" />
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/fa-all.css"/>
+
+	<script src="/static/js/jquery-3.4.1.min.js"></script>
+	<script src="/static/js/popper.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+	<script src="/static/js/fa-all.js"></script>
+
+	<script language="javascript" src="/static/js/jscrypto/sjcl.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/jsbn.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/jsbn2.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/sha1.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/sha2.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/bigint.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/class.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/elgamal.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/helios.js"></script>
+
+	<script language="javascript" src="/static/js/jsrender.js"></script>
+
+	<script language="javascript" src="/static/js/jquery.query-2.1.5.js"></script>
+	<script language="javascript" src="/static/js/jquery.json.min.js"></script>
+	<script language="javascript" src="/static/js/booth.js?ts=2020-10-31"></script>
+</head>
+<body>
+	<div class="container-sm p-0">
+		<div id="content">
+			<nav class="navbar navbar-dark bg-dark">
+				<a class="navbar-brand">
+					<img class="mr-2" src="/static/media/tjpr_pequeno.png">
+					<span class="font-weight-bold">Cabina de Votação</span>
+				</a>
+				<a class="btn btn-sm btn-danger" href="javascript:BOOTH.exit();"><span class="fas fa-fw fa-door-open"></span> Sair</a>
+			</nav>
+			<div id="header"></div>
+			<div id="page">
+
+				<ul class="nav nav-pills justify-content-center mt-3 mb-3" id="progress_nav">
+					<li class="nav-item">
+						<a class="nav-link" href="#"><span class="badge badge-secondary">1</span> Selecionar</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#"><span class="badge badge-secondary">2</span> Revisar</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="#"><span class="badge badge-secondary">3</span> Enviar</a>
+					</li>
+				</ul>
+
+				<div id="election_div" class="panel">
+					<div class="text-center m-5">
+						<h4>Checando os requisitos e carregando a cabina de votação...</h4>
+						<div class="spinner-border" role="status"></div>
+						<div class="text-center text-muted">
+							Isto pode levar até 10 segundos
+						</div>
+					</div>
+				</div>
+
+				<div id="question_div" class="panel"></div>
+
+				<div id="processing_div" class="panel" style="display:none;">
+					<h3 align="center">Processando....</h3>
+				</div>
+
+				<div id="encrypting_div" class="panel" style="display:none;">
+					<h3 align="center">O sistema está criptografando a sua cédula<br />
+					<img src="/static/media/encrypting.gif" /> <span style="font-size:0.7em; display:none;" id="percent_done_container">(<span id="percent_done">0</span>%)</span></h3>
+
+					<p align="center"><b>Isto pode levar alguns minutos.</b>
+				</div>
+
+				<div id="seal_div" class="panel"></div>
+
+				<div id="audit_div" class="panel"></div>
+			</div>
+			<br clear="both" />
+		</div>
+
+		<footer class="footer font-small text-muted border-top pt-2" id="footer">
+
+		</footer>
+	</div>
+	<div id="applet_div"></div>
+</body>
+</html>

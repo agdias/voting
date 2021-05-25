@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" />
+	<title>Sistema de Eleições</title>
+
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="/static/css/fa-all.css"/>
+	<script src="/static/js/jquery-3.4.1.min.js"></script>
+	<script src="/static/js/popper.min.js"></script>
+	<script src="/static/js/bootstrap.min.js"></script>
+	<script src="/static/js/fa-all.js"></script>
+
+	<script language="javascript" src="/static/js/jquery-3.4.1.min.js"></script>
+	<script language="javascript" src="/static/js/jquery.json.min.js"></script>
+	<script language="javascript" src="/static/js/jquery.query-2.1.5.js"></script>
+
+	<script language="javascript">
+		// required for jscrypto library
+		var JSCRYPTO_HOME = "/static/js/jscrypto";
+	</script>
+	<script language="javascript" src="/static/js/jscrypto/jsbn.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/jsbn2.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/sjcl.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/class.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/bigint.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/random.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/elgamal.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/sha1.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/sha2.js"></script>
+	<script language="javascript" src="/static/js/jscrypto/helios.js"></script>
+	<script language="javascript" src="/static/js/verifier.js"></script>
+	<script language="javascript" src="/static/js/single-ballot-verify.js"></script>
+</head>
+
+<body>
+	<div class="container-sm p-0">
+		<div id="content">
+			<nav class="navbar navbar-dark bg-dark">
+				<a class="navbar-brand">
+					<img class="mr-2" src="/static/media/tjpr_pequeno.png">
+					<span class="font-weight-bold">Verificador de Cédula Individual</span>
+				</a>
+			</nav>
+
+			<div id="verifier_loading">Carregando verificador...</div>
+
+			<div id="dummy_bigint" style="display:none;">
+				O seu navegador não tem o plugin Java instalado.<br /><br />
+				No momento, o plugin Java é necessário para realizar a auditoria da cédula, embora não seja necessário para o preparo da mesma.
+			</div>
+
+			<div id="verifier" style="display:none;">
+				<p>Este verificador individual de cédula permite que você informe uma cédula auditada e verifique se a mesma foi preparada corretamente.</p>
+
+				<form onsubmit="try {verify_single_ballot(this.election_url.value, this.audit_trail.value);} catch (e) {E = e;} return false;">
+					<div class="form-group">
+						<label for="election_url">Informe a URL da Eleição:</label>
+						<div class="input-group mb-2">
+							<div class="input-group-prepend">
+								<div class="input-group-text"><span class="fa fa-fw fa-globe"></span></div>
+							</div>
+							<input class="form-control" id="election_url" name="election_url" placeholder="URL da Eleição">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="audit_trail">Cédula a ser verificada:</label>
+						<textarea name="audit_trail" id="audit_trail" class="form-control" rows="7" style="font-family: monospace;"></textarea>
+					</div>
+					<p></p>
+
+					<button type="submit" class="btn btn-primary"><span class="fa fa-fw fa-check"></span> Verificar</button>
+				</form>
+
+				<div id="loading" class="panel" style="display: none;">
+					<div class="text-center m-5">
+						<div class="spinner-border" role="status"></div>
+						<div class="text-center text-muted">
+							Verificando a cédula...
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-4">
+					<pre><code id="results"></code></pre>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div id="applet_div"></div>
+	</body>
+</html>

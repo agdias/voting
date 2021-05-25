@@ -1,0 +1,18 @@
+{% extends TEMPLATE_BASE %}
+
+{% block content %}
+	<h1>Por que nós precisamos de suas informações?</h1>
+
+	<p>
+		Parece que você negou permissão de acesso às suas informações. Nós entendemos e valorizamos sua privacidade.
+		Nós pedimos por essa informação para que possamos contactá-lo com seu número de rastreamento de voto e quando
+		uma eleição na qual você participou foi apurada. Nós prometemos não usar essa informação para nenhum outro
+		propósito. Sem essa informação, infelizmente não podemos ajudá-lo a votar.
+	</p>
+
+	<form method="POST" action="">
+		<input type="hidden" value="{{csrf_token}}" />
+		<input type="submit" value="Ok, entendi, vamos efetuar o login." /><br /><br />
+		<a href="https://www.tjpr.jus.br">não, tire-me daqui</a>.
+	</form>
+{% endblock %}

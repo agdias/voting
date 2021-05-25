@@ -1,0 +1,62 @@
+{% extends TEMPLATE_BASE %}
+
+{% block title %}Inclusão de Eleitores para {{election.name}} - Confirmação{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-list-pretty' election.uuid %}">Eleitores e Cédulas</a></li>
+			<li class="breadcrumb-item active"><a href="{% url 'voters-upload' election_uuid=election.uuid %}">Envio de Arquivo</a></li>
+			<li class="breadcrumb-item active">Confirmação</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Arquivo de Eleitores &mdash; Confirmação</h2>
+
+	<p>Você carregou um arquivo de eleitores. As primeiras linhas desse arquivo são exibidas abaixo para simples conferência:</p>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Login do eleitor</th>
+				<th>Endereço de e-mail</th>
+				<th>Nome</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for v in voters %}
+				<tr>
+					<td>{{v.voter_id}}</td>
+					<td>{{v.email}}</td>
+					<td>{{v.name}}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{% if problems %}
+		<div class="alert alert-danger fade show" role="alert">
+			Problemas encontrados:<br/>
+			{% for problem in problems %}
+				- {{problem}}<br />
+			{% endfor %}
+			<button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+
+		<a class="btn btn-primary" href="{% url 'voters-upload' election_uuid=election.uuid %}">Enviar outro arquivo</a>
+	{% else %}
+		<p/>
+		<form method="post" action="" id="upload_form">
+			Os dados estão OK?
+			<input type="hidden" name="confirm_p" value="1" />
+			<button class="btn btn-success" type="submit"><span class="fa fa-fw fa-check"></span> Sim, prosseguir</button>
+			<a class="btn btn-danger" href="{% url 'voters-upload' election_uuid=election.uuid %}"><span class="fa fa-fw fa-times"></span> Não, deixe-me enviar um arquivo diferente</a>
+		</form>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  DATABASE: helios
+  PASSWORD: helios
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: pg_2oo9
+  ROLE: helios
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: helios-postgres-cm
+  namespace: helio

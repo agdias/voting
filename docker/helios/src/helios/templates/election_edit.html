@@ -1,0 +1,36 @@
+{% extends TEMPLATE_BASE %}
+{% load tjpr_form %}
+
+{% block title %}Editar Eleição{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item"><a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a></li>
+			<li class="breadcrumb-item active">Editar Eleição</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">{{election.name}} &mdash; Atualizar</h2>
+	<div class="card">
+		<div class="card-body">
+			{% if error %}
+				<p style="color: red;">{{error}}</p>
+			{% endif %}
+
+			<form class="form-horizontal" action="" method="POST" id="edit_election_form">
+				<input type="hidden" name="csrf_token" value="{{csrf_token}}" />
+				<table class="pretty">
+					{% tjpr_form election_form 'horizontal' %}
+				</table>
+				<div class="text-right">
+					<input class="btn btn-primary" type="submit" value="Atualizar" id="update_button" />
+					<a class="btn btn-danger" href="{% url "one-election-view" election.uuid %}">Cancelar</a>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

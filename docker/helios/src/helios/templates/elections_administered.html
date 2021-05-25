@@ -1,0 +1,26 @@
+{% extends TEMPLATE_BASE %}
+{% block title %}Eleições{% endblock %}
+
+{% block breadcrumb %}
+	<nav>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+			<li class="breadcrumb-item active">Eleições</li>
+		</ol>
+	</nav>
+{% endblock %}
+
+{% block content %}
+	<h2 class="title">Eleições que você administra</h2>
+
+	<ul class="list-group ml-3">
+		{% for election in elections %}
+			<li class="list-group-item">
+				<a href="{% url 'one-election-view' election.uuid %}">{{election.name}}</a>
+				<span class="text-muted small ml-3">
+					{{election.num_voters}} eleitor{{ election.num_voters|pluralize:"es" }} / {{election.num_cast_votes}} voto{{ election.num_cast_votes|pluralize }} depositado{{ election.num_cast_votes|pluralize }}
+				</span>
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
