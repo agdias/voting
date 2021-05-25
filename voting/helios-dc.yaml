@@ -2,7 +2,7 @@ apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
   name: helios-voting
-  namespace: helio
+  namespace: helios
 spec:
   replicas: 1
   selector:
@@ -20,7 +20,7 @@ spec:
          persistentVolumeClaim:
           claimName: helios-dados-claim
       containers:
-      - image: angelodias/helios:latest
+      - image: registry.tjmg.gov.br/helios-voting:helios:latest
         name: helios
         ports:
         - containerPort: 8000
